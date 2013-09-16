@@ -28,7 +28,7 @@ module.exports = function(grunt) {
       },
       typescript_server: {
         files: serverJs,
-        tasks: ['typescript'],
+        tasks: ['typescript:server'],
         options: {
           livereload: true
         }
@@ -112,7 +112,12 @@ module.exports = function(grunt) {
       tsd: {
         cmd: function() {
           var dependencies = [
-            'node', 'express', 'socket.io'
+            'node',
+            'express',
+            'socket.io',
+            'easeljs',
+            'tweenjs',
+            'preloadjs'
           ];
           return 'tsd install ' + dependencies.join(' ');
         }
