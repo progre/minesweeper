@@ -1,0 +1,27 @@
+{
+  "name": "application-name",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app"
+  },
+  "dependencies": {
+    "express": "*",
+    "log4js": "*",
+    "dateformat": "*",
+    "mongodb": "*",
+    "clone": "*",
+    "socket.io": "*"
+  },
+  "devDependencies": {
+    "tsd": "*",
+    "grunt": "*",
+    "grunt-develop": "*",
+    "grunt-exec": "*",
+    "grunt-typescript": "*",
+    "grunt-contrib-stylus": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-contrib-copy": "*",
+    "grunt-contrib-jade": "*"
+  }
+}

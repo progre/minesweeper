@@ -1,0 +1,12 @@
+node_modules/
+public/components
+.sass-cache
+*.map
+*.js
+*.css
+*.log*
+*.html
+secret.json
+
+!Gruntfile.js
+!/lib/*.js
