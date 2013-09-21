@@ -1,0 +1,6 @@
+[submodule "src/public/js/minesweeper-common"]
+	path = src/public/js/minesweeper-common
+	url = git@github.com:progre/minesweeper-common.git
+[submodule "src/minesweeper-common"]
+	path = src/minesweeper-common
+	url = git@github.com:progre/minesweeper-common.git
