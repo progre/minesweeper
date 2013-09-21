@@ -17,6 +17,13 @@ export class Game {
 
     run() {
         var canvas = <HTMLCanvasElement>this.window.document.getElementById('canvas');
+        if (canvas == null) {
+            var func = ev => {
+                this.window.removeEventListener('focus', func);
+                this.run();
+            };
+            this.window.addEventListener('focus', func);
+        }
         var stage = new createjs.Stage(canvas);
         this.resize(canvas, stage);
         var presenterObj = new presenter.Presenter(stage, this.userAsset, this.userSceneFactory);

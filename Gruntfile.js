@@ -114,7 +114,6 @@ module.exports = function(grunt) {
           var dependencies = [
             'node',
             'express',
-            'socket.io',
             'easeljs',
             'tweenjs',
             'preloadjs'

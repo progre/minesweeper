@@ -9,7 +9,8 @@
     "dateformat": "*",
     "mongodb": "*",
     "clone": "*",
-    "socket.io": "*"
+    "socket.io": "git://github.com/LearnBoost/socket.io",
+    "biginteger": "~1.0.1"
   },
   "devDependencies": {
     "tsd": "*",

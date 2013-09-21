@@ -1,14 +1,16 @@
 import http = require('http');
 import express = require('express');
+var socketio = require('socket.io');
 var log4js = require('log4js');
 
 export = server;
-function server(ipaddress: string, port: number, publicPath: string, router:any) {
+function server(ipaddress: string, port: number, publicPath: string, router: any) {
     var logger = log4js.getLogger();
+
     var app = express();
     app.configure(() => {
         app.use((req, res, next) => {
-            writeAccessLog(logger, req, res);
+            logger.info(toAccessLog(req, res));
             next();
         });
         app.use(express.favicon());
@@ -32,12 +34,27 @@ function server(ipaddress: string, port: number, publicPath: string, router:any)
         app.use(express.errorHandler());
     });
 
-    http.createServer(app).listen(port, ipaddress, null,
+    var server = http.createServer(app);
+
+    var io = null;
+    for (var key in router) {
+        if (key === 'websocket')
+            continue;
+        if (io == null) {
+            io = socketio(server);
+        }
+        var ws = router[key];
+        for (var event in ws) {
+            io.on(event, ws[event]);
+        }
+    }
+    server.listen(port, ipaddress, null,
         () => logger.info('Express server listening on port ' + port));
+
 }
 
-function writeAccessLog(logger: any, req: http.ServerRequest, res: http.ServerResponse) {
-    logger.info([
+function toAccessLog(req: http.ServerRequest, res: http.ServerResponse) {
+    return [
         req.headers['x-forwarded-for'] || (<any>req).client.remoteAddress,
         new Date().toLocaleString(),
         req.method,
@@ -45,5 +62,5 @@ function writeAccessLog(logger: any, req: http.ServerRequest, res: http.ServerRe
         res.statusCode,
         req.headers.referer || '-',
         req.headers['user-agent'] || '-'
-    ].join('\t'));
+    ].join('\t');
 }
