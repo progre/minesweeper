@@ -2,9 +2,7 @@
   "name": "application-name",
   "version": "0.0.1",
   "private": true,
-  "scripts": {
-    "start": "node app"
-  },
+  "main": "server.js",
   "dependencies": {
     "express": "*",
     "log4js": "*",

@@ -1,17 +1,16 @@
-declare class BigInteger {
-    constructor(a: string);
-    constructor(a: number, b: number, c: number);
-    toString(radix:number): string;
-    negate: Function;
-    abs: Function;
-    compareTo: Function;
-    bitLength: Function;
-    mod: Function;
-    modPowInt: Function;
-}
-
 export = Coord;
 class Coord {
-    private x: BigInteger;
-    private y: BigInteger;
+    static of(x: string, y: string) {
+        return new Coord(new BigInteger(x), new BigInteger(y));
+    }
+
+    /** @private */
+    constructor(
+        private x: BigInteger,
+        private y: BigInteger) {
+    }
+
+    subtract(target: Coord) {
+        return new Coord(this.x.subtract(target.x), this.y.subtract(target.y));
+    }
 }
