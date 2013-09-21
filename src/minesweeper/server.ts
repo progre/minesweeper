@@ -1,5 +1,8 @@
 var log4js = require('log4js');
 import expressServer = require('./expressserver');
+import Player = require('./domain/entity/player');
+import Coord = require('./../minesweeper-common/domain/valueobject/coord');
+import ifs = require('./../minesweeper-common/infrastructure/valueobject/interfaces');
 
 export = server;
 function server(ipaddress: string, port: number, publicPath: string) {
@@ -9,8 +12,13 @@ function server(ipaddress: string, port: number, publicPath: string) {
     };
     var socket = {
         'connection': client => {
-            client.join('0');
-            logger.info(client);
+            client.join(0); // ‚Æ‚è‚ ‚¦‚¸room‚É“ü‚ê‚Ä‚¨‚­
+            var data: ifs.IMineWorldDTO = {
+                players: {
+                    0: { coord: { x: '0', y: '0' }, image: 'remilia' }
+                }
+            };
+            client.emit('full_data', data);
             client.on('event', data => {
                 logger.info(data);
             });

@@ -1,4 +1,4 @@
-import Coord = require('./../valueobject/coord');
+import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
 
 export = Player;
 class Player {
