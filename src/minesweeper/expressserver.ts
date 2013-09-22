@@ -36,18 +36,10 @@ function server(ipaddress: string, port: number, publicPath: string, router: any
 
     var server = http.createServer(app);
 
-    var io = null;
-    for (var key in router) {
-        if (key === 'websocket')
-            continue;
-        if (io == null) {
-            io = socketio(server);
-        }
-        var ws = router[key];
-        for (var event in ws) {
-            io.on(event, ws[event]);
-        }
+    if (router['io'] != null) {
+        router['io'](socketio(server));
     }
+
     server.listen(port, ipaddress, null,
         () => logger.info('Express server listening on port ' + port));
 

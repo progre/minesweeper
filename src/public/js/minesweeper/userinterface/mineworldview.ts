@@ -76,8 +76,8 @@ class MineWorldView extends EventEmitter2 {
         this.displayObject.addChild(this.players.displayObject);
 
         this.clickObject.addEventListener('click', (eventObj: any) => {
-            var col = eventObj.stageX - (this._size.width >> 1);
-            var row = eventObj.stageY - (this._size.height >> 1);
+            var col = Math.round((eventObj.stageX - (this._size.width >> 1)) / 32);
+            var row = Math.round((eventObj.stageY - (this._size.height >> 1)) / 32);
             super.emit('click', {
                 coord: Coord.fromNumber(col, row).subtract(this._center),
                 type: eventObj.nativeEvent.button

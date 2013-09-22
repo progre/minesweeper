@@ -24,12 +24,12 @@ class GameScene implements game.Scene {
         var server = server.on('connect', () => {
             server.on('full_data', (dto: iv.IFullDataDTO) => {
                 this.mineWorldView.setModel(dxo.toMineWorld(dto));
-                this.mineWorldView.center = Coord.of('1', '0');
             });
             server.on('move', (obj: iv.IMoveDTO) => {
                 this.mineWorldView.players.move(obj.id, dxo.toCoord(obj.coord));
             });
             server.on('dig', (obj: iv.IMoveDTO) => {
+                console.log(obj);
                 this.mineWorldView.players.move(obj.id, dxo.toCoord(obj.coord));
             });
             server.on('flag', (obj: iv.IMoveDTO) => {
