@@ -10,20 +10,19 @@ var WS_ADDRESS = '127.0.0.1';
 
 export = GameScene;
 class GameScene implements game.Scene {
-    displayObject = new createjs.Container();
-    private mineWorldView = new MineWorldView();
+    static resourceFiles = ['/img/block.png'].concat(MineWorldView.resourceFiles);
 
-    static getResourceFiles() {
-        return ['/img/block.png'];
-    }
+    displayObject = new createjs.Container();
+    private mineWorldView: MineWorldView;
 
     constructor(loadQueue: createjs.LoadQueue) {
+        this.mineWorldView = new MineWorldView(loadQueue);
         this.displayObject.addChild(this.mineWorldView.displayObject);
 
         // サーバーに接続
         var server = io(WS_ADDRESS);
         var server = server.on('connect', () => {
-            server.on('full_data', (dto: iv.IMineWorldDTO) => {
+            server.on('full_data', (dto: iv.IFullDataDTO) => {
                 this.mineWorldView.setModel(unpack(dto));
             });
             server.on('disconnect', () => {
@@ -52,13 +51,25 @@ class GameScene implements game.Scene {
         });
     }
 
+    wakeup(size: game.Rect) {
+        this.mineWorldView.size = size;
+    }
+
     update(): game.Scene {
         return null;
     }
+
+    resize(size: game.Rect) {
+        this.mineWorldView.size = size;
+    }
+
+    suspend() {
+    }
 }
 
-function unpack(dto: iv.IMineWorldDTO): de.IMineWorld {
+function unpack(dto: iv.IFullDataDTO): de.IMineWorld {
     return {
+        yourId: dto.yourId,
         players: Enumerable.from(dto.players)
             .select((x: KVP<iv.IPlayerDTO>) => ({ key: x.key, value: unpackPlayer(x.value) }))
             .toObject(x => x.key, x => x.value)

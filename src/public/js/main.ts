@@ -7,4 +7,4 @@
 import game = require('./framework/game');
 import GameScene = require('./minesweeper/userinterface/gamescene');
 
-new game.Game(window, GameScene.getResourceFiles(), loadQueue => new GameScene(loadQueue), -1).run();
+new game.Game(window, GameScene.resourceFiles, loadQueue => new GameScene(loadQueue), -1).run();

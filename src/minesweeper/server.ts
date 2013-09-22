@@ -13,7 +13,8 @@ function server(ipaddress: string, port: number, publicPath: string) {
     var socket = {
         'connection': client => {
             client.join(0); // ‚Æ‚è‚ ‚¦‚¸room‚É“ü‚ê‚Ä‚¨‚­
-            var data: ifs.IMineWorldDTO = {
+            var data: ifs.IFullDataDTO = {
+                yourId: '0',
                 players: {
                     0: { coord: { x: '0', y: '0' }, image: 'remilia' }
                 }

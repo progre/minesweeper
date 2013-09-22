@@ -25,55 +25,66 @@ export class Game {
             this.window.addEventListener('focus', func);
         }
         var stage = new createjs.Stage(canvas);
-        this.resize(canvas, stage);
         var presenterObj = new presenter.Presenter(stage, this.userAsset, this.userSceneFactory);
-        this.window.addEventListener('resize', () => this.resize(canvas, stage));
+        this.setSize(canvas, stage, presenterObj);
+        this.window.addEventListener('resize', () => this.setSize(canvas, stage, presenterObj));
 
-        presenterObj.load(eventObj => {
-            createjs.Ticker.setFPS(60);
-            createjs.Ticker.addListener(() => {
-                presenterObj.update();
-                stage.update();
-            });
-            return true;
+        createjs.Ticker.setFPS(30);
+        createjs.Ticker.addListener(() => {
+            presenterObj.update();
+            stage.update();
         });
+        presenterObj.load();
     }
 
-    private resize(canvas: HTMLCanvasElement, stage: createjs.Stage) {
+    private setSize(canvas: HTMLCanvasElement, stage: createjs.Stage, presenterObj: presenter.Presenter) {
         if (this.dotBydot) {
-            canvas.width = this.window.innerWidth;
-            canvas.height = this.window.innerHeight;
-            stage.scaleX = 1;
-            stage.scaleY = 1;
-            stage.x = canvas.width / 2;
-            stage.y = canvas.height / 2;
+            this.setSizeDotbydot(
+                canvas, stage, presenterObj,
+                new Rect(this.window.innerWidth,
+                    this.window.innerHeight));
             return;
         }
         var windowWidth = this.window.innerWidth;
         var windowHeight = this.window.innerHeight;
         if (windowWidth / windowHeight < this.width / this.height) {
-            this.setSize(
-                canvas, stage,
-                windowWidth,
-                windowWidth * (this.height / this.width));
+            this.setScaledSize(
+                canvas, stage, presenterObj,
+                new Rect(windowWidth,
+                    windowWidth * (this.height / this.width)));
         } else {
-            this.setSize(
-                canvas, stage,
-                windowHeight * (this.width / this.height),
-                windowHeight);
+            this.setScaledSize(
+                canvas, stage, presenterObj,
+                new Rect(windowHeight * (this.width / this.height),
+                    windowHeight));
         }
     }
 
-    private setSize(canvas: HTMLCanvasElement, stage: createjs.Stage, width: number, height: number) {
-        canvas.width = width;
-        canvas.height = height;
-        stage.scaleX = width / this.width;
-        stage.scaleY = height / this.height;
+    private setSizeDotbydot(canvas: HTMLCanvasElement, stage: createjs.Stage, presenterObj: presenter.Presenter, rect: Rect) {
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        stage.scaleX = 1;
+        stage.scaleY = 1;
+        stage.x = canvas.width / 2;
+        stage.y = canvas.height / 2;
+        presenterObj.size = rect;
+    }
+
+    private setScaledSize(canvas: HTMLCanvasElement, stage: createjs.Stage, presenterObj: presenter.Presenter, rect: Rect) {
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        stage.scaleX = rect.width / this.width;
+        stage.scaleY = rect.height / this.height;
+        presenterObj.size = rect;
     }
 }
 
-export interface Scene {
-    displayObject: createjs.DisplayObject;
-    /** ‘JˆÚ‚·‚éƒV[ƒ“‚ð•Ô‚· */
-    update(): Scene;
+export interface Scene extends presenter.Scene {
+}
+
+export class Rect implements presenter.Rect {
+    constructor(
+        public width: number,
+        public height: number) {
+    }
 }
