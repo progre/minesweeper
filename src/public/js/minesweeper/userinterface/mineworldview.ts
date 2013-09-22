@@ -1,57 +1,7 @@
 import game = require('./../../framework/game');
 import Coord = require('./../../minesweeper-common/domain/valueobject/coord');
 import ifs = require('./../../minesweeper-common/domain/entity/interfaces');
-
-class PlayerView {
-    static resourceFiles = ['/img/remilia.png'];
-
-    displayObject: createjs.BitmapAnimation;
-
-    constructor(private loadQueue: createjs.LoadQueue, private model: ifs.IPlayer) {
-        var ssOpt = {
-            images: [this.loadQueue.getResult('/img/remilia.png')],
-            frames: { width: 32, height: 32 },
-            animations: {
-                'walk': { frames: [0, 1, 2, 1], frequency: 6 }
-            }
-        };
-        var ss = new createjs.SpriteSheet(ssOpt);
-        this.displayObject = new createjs.BitmapAnimation(ss);
-        this.displayObject.gotoAndPlay('walk');
-    }
-
-    set center(value: Coord) {
-        var coord = this.model.coord.subtract(value);
-        this.displayObject.x = coord.x * 32 - 16;
-        this.displayObject.y = coord.y * 32 - 24;
-    }
-}
-
-class PlayersView {
-    static resourceFiles = PlayerView.resourceFiles;
-
-    displayObject = new createjs.Container();
-    private items: PlayerView[] = [];
-
-    constructor(
-        private loadQueue: createjs.LoadQueue) {
-    }
-
-    set model(value: ifs.IHash<ifs.IPlayer>) {
-        // players‚É“ü‚Á‚Ä‚é‚â‚Â‚ð•\Ž¦
-        Enumerable.from(value).forEach((x: { key: string; value: ifs.IPlayer }) => {
-            var playerView = new PlayerView(this.loadQueue, x.value);
-            this.displayObject.addChild(playerView.displayObject);
-            this.items.push(playerView);
-        });
-    }
-
-    set center(value: Coord) {
-        this.items.forEach(player => {
-            player.center = value;
-        });
-    }
-}
+import PlayersView = require('./playersview');
 
 class BlocksView {
     static resourceFiles = ['/img/block.png'];
@@ -108,22 +58,24 @@ class BlocksView {
 
 export = MineWorldView;
 class MineWorldView extends EventEmitter2 {
-    static resourceFiles = PlayerView.resourceFiles;
+    static resourceFiles = PlayersView.resourceFiles;
 
     displayObject = new createjs.Container();
-    private blocksView: BlocksView;
-    private playersView: PlayersView;
+    private clickObject = createWall();
+    private blocks: BlocksView;
+    players: PlayersView;
     private _size = new game.Rect(0, 0);
     private _center = Coord.of('0', '0');
 
     constructor(private loadQueue: createjs.LoadQueue) {
         super();
-        this.blocksView = new BlocksView(loadQueue);
-        this.displayObject.addChild(this.blocksView.backDisplayObject);
-        this.playersView = new PlayersView(loadQueue);
-        this.displayObject.addChild(this.playersView.displayObject);
+        this.displayObject.addChild(this.clickObject);
+        this.blocks = new BlocksView(loadQueue);
+        this.displayObject.addChild(this.blocks.backDisplayObject);
+        this.players = new PlayersView(loadQueue);
+        this.displayObject.addChild(this.players.displayObject);
 
-        this.displayObject.addEventListener('click', (eventObj: any) => {
+        this.clickObject.addEventListener('click', (eventObj: any) => {
             var col = eventObj.stageX - (this._size.width >> 1);
             var row = eventObj.stageY - (this._size.height >> 1);
             super.emit('click', {
@@ -135,18 +87,26 @@ class MineWorldView extends EventEmitter2 {
 
     set size(value: game.Rect) {
         this._size = value;
-        this.blocksView.size = value;
+        this.blocks.size = value;
     }
 
-    set model(model: ifs.IMineWorld) {
-        this.playersView.model = model.players;
+    setModel(model: ifs.IMineWorld) {
+        this.players.model = model.players;
         this.center = model.players[model.yourId].coord;
     }
 
     set center(value: Coord) {
-        this.playersView.center = value;
+        this.players.center = value;
     }
 
     private moveCenter(x: number, y: number) {
     }
+}
+
+function createWall() {
+    var wall = new createjs.Shape();
+    wall.graphics.beginFill('#000').drawRect(0, 0, 65535, 65535);
+    wall.x = -65535 / 2;
+    wall.y = -65535 / 2;
+    return wall;
 }

@@ -3,7 +3,7 @@ import game = require('./framework/game');
 import MineWorldView = require('./mineworldview');
 import Coord = require('./../../minesweeper-common/domain/valueobject/coord');
 import iv = require('./../../minesweeper-common/infrastructure/valueobject/interfaces');
-import de = require('./../../minesweeper-common/domain/entity/interfaces');
+import dxo = require('./../../minesweeper-common/infrastructure/service/dxo');
 
 var WS_ADDRESS = '127.0.0.1';
 //var WS_ADDRESS = ':8000';
@@ -23,14 +23,17 @@ class GameScene implements game.Scene {
         var server = io(WS_ADDRESS);
         var server = server.on('connect', () => {
             server.on('full_data', (dto: iv.IFullDataDTO) => {
-                this.mineWorldView.model = unpack(dto);
+                this.mineWorldView.setModel(dxo.toMineWorld(dto));
                 this.mineWorldView.center = Coord.of('1', '0');
             });
-            server.on('move', () => {
+            server.on('move', (obj: iv.IMoveDTO) => {
+                this.mineWorldView.players.move(obj.id, dxo.toCoord(obj.coord));
             });
-            server.on('dig', () => {
+            server.on('dig', (obj: iv.IMoveDTO) => {
+                this.mineWorldView.players.move(obj.id, dxo.toCoord(obj.coord));
             });
-            server.on('flag', () => {
+            server.on('flag', (obj: iv.IMoveDTO) => {
+                this.mineWorldView.players.move(obj.id, dxo.toCoord(obj.coord));
             });
             server.on('opened', () => {
             });
@@ -42,15 +45,15 @@ class GameScene implements game.Scene {
                 console.log('disconnect');
             });
 
-            this.mineWorldView.on('click', e => {
+            this.mineWorldView.on('click', (e: { coord: Coord; type: number; }) => {
                 if (false) {
-                    server.emit('move', { coord: e.coord.pack() });
+                    server.emit('move', { coord: dxo.fromCoord(e.coord) });
                 }
                 if (e.type === 0) {
-                    server.emit('dig', { coord: e.coord.pack() });
+                    server.emit('dig', { coord: dxo.fromCoord(e.coord) });
                 }
                 if (e.type === 2) {
-                    server.emit('flag', { coord: e.coord.pack() });
+                    server.emit('flag', { coord: dxo.fromCoord(e.coord) });
                 }
             });
         });
@@ -90,27 +93,4 @@ class GameScene implements game.Scene {
 
     suspend() {
     }
-}
-
-function unpack(dto: iv.IFullDataDTO): de.IMineWorld {
-    return {
-        yourId: dto.yourId,
-        players: Enumerable.from(dto.players)
-            .select((x: KVP<iv.IPlayerDTO>) => ({ key: x.key, value: unpackPlayer(x.value) }))
-            .toObject(x => x.key, x => x.value)
-    };
-}
-
-function unpackPlayer(dto: iv.IPlayerDTO): de.IPlayer {
-    return {
-        coord: unpackCoord(dto.coord),
-        image: dto.image
-    };
-}
-
-var unpackCoord = (dto: iv.ICoordDTO) => Coord.of(dto.x, dto.y);
-
-interface KVP<T> {
-    key: string;
-    value: T;
 }
