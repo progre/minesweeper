@@ -29,7 +29,7 @@ export class Game {
         this.setSize(canvas, stage, presenterObj);
         this.window.addEventListener('resize', () => this.setSize(canvas, stage, presenterObj));
 
-        createjs.Ticker.setFPS(30);
+        createjs.Ticker.setFPS(60);
         createjs.Ticker.addListener(() => {
             presenterObj.update();
             stage.update();
@@ -65,8 +65,8 @@ export class Game {
         canvas.height = rect.height;
         stage.scaleX = 1;
         stage.scaleY = 1;
-        stage.x = canvas.width / 2;
-        stage.y = canvas.height / 2;
+        stage.x = canvas.width >> 1;
+        stage.y = canvas.height >> 1;
         presenterObj.size = rect;
     }
 
