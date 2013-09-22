@@ -55,27 +55,32 @@ class MineWorldView {
         this.background.uncache();
 
         // ƒuƒƒbƒNˆê‚Â‚Í32px
-        var xCount = value.width / 32 | 0;
-        if (xCount % 2 === 0) {
-            xCount++;
+        var colCount = value.width / 32 | 0;
+        if (colCount % 2 === 0) {
+            colCount++;
         }
-        xCount += 2;
-        var yCount = value.height / 32 | 0;
-        if (yCount % 2 === 0) {
-            yCount++;
+        colCount += 2;
+        var rowCount = value.height / 32 | 0;
+        if (rowCount % 2 === 0) {
+            rowCount++;
         }
-        yCount += 2;
-        var left = -(xCount >> 1) * 32 - 16;
-        var top = -(yCount >> 1) * 32 - 16;
-        for (var y = 0; y < yCount; y++) {
-            for (var x = 0; x < xCount; x++) {
+        rowCount += 2;
+        var left = -(colCount >> 1) * 32 - 16;
+        var top = -(rowCount >> 1) * 32 - 16;
+        for (var row = 0; row < rowCount; row++) {
+            for (var col = 0; col < colCount; col++) {
                 var block = this.templateBlock.clone();
-                block.x = left + x * 32;
-                block.y = top + y * 32;
+                block.x = left + col * 32;
+                block.y = top + row * 32;
                 this.background.addChild(block);
             }
         }
-        this.background.cache(left, top, xCount * 32, yCount * 32);
+        this.background.cache(left, top, colCount * 32, rowCount * 32);
+        this.background.addEventListener('click', (eventObj: any) => {
+            var x = eventObj.stageX - (value.width >> 1);
+            var y = eventObj.stageY - (value.height >> 1);
+            console.log(Math.round(x / 32), Math.round(y / 32));
+        });
     }
 
     setModel(model: ifs.IMineWorld) {

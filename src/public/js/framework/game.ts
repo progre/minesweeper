@@ -13,6 +13,10 @@ export class Game {
         if (width < 0) {
             this.dotBydot = true;
         }
+        // 右クリックをキャンセル
+        window.addEventListener('contextmenu', e => {
+            e.preventDefault();
+        }, false);
     }
 
     run() {
@@ -24,6 +28,10 @@ export class Game {
             };
             this.window.addEventListener('focus', func);
         }
+        this.init(canvas);
+    }
+
+    private init(canvas: HTMLCanvasElement) {
         var stage = new createjs.Stage(canvas);
         var presenterObj = new presenter.Presenter(stage, this.userAsset, this.userSceneFactory);
         this.setSize(canvas, stage, presenterObj);
