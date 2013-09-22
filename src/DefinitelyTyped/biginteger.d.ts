@@ -6,6 +6,7 @@ declare module 'biginteger' {
         static _0: BigInteger;
         static _1: BigInteger;
         static small: any;
+        static parse(s: string, base: number);
 
         constructor();
         constructor(n: number);
@@ -38,7 +39,7 @@ declare module 'biginteger' {
         pow: Function;
         modPow: Function;
         valueOf: Function;
-        toJSValue: Function;
+        toJSValue: () => number;
 
         MAX_EXP: any;
     }

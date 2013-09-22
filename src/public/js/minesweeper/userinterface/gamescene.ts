@@ -23,10 +23,35 @@ class GameScene implements game.Scene {
         var server = io(WS_ADDRESS);
         var server = server.on('connect', () => {
             server.on('full_data', (dto: iv.IFullDataDTO) => {
-                this.mineWorldView.setModel(unpack(dto));
+                this.mineWorldView.model = unpack(dto);
+                this.mineWorldView.center = Coord.of('1', '0');
+            });
+            server.on('move', () => {
+            });
+            server.on('dig', () => {
+            });
+            server.on('flag', () => {
+            });
+            server.on('opened', () => {
+            });
+            server.on('flagged', () => {
+            });
+            server.on('bomb', () => {
             });
             server.on('disconnect', () => {
                 console.log('disconnect');
+            });
+
+            this.mineWorldView.on('click', e => {
+                if (false) {
+                    server.emit('move', { coord: e.coord.pack() });
+                }
+                if (e.type === 0) {
+                    server.emit('dig', { coord: e.coord.pack() });
+                }
+                if (e.type === 2) {
+                    server.emit('flag', { coord: e.coord.pack() });
+                }
             });
         });
         server.on('connect_error', err => {
