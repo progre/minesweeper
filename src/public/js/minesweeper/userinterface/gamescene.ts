@@ -1,12 +1,9 @@
-declare var io;
 import game = require('./framework/game');
 import MineWorldView = require('./mineworldview');
 import Coord = require('./../../minesweeper-common/domain/valueobject/coord');
 import iv = require('./../../minesweeper-common/infrastructure/valueobject/interfaces');
 import dxo = require('./../../minesweeper-common/infrastructure/service/dxo');
-
-var WS_ADDRESS = '127.0.0.1';
-//var WS_ADDRESS = ':8000';
+import ioserver = require('./../infrastructure/server');
 
 export = GameScene;
 class GameScene implements game.Scene {
@@ -20,8 +17,8 @@ class GameScene implements game.Scene {
         this.displayObject.addChild(this.mineWorldView.displayObject);
 
         // サーバーに接続
-        var server = io(WS_ADDRESS);
-        var server = server.on('connect', () => {
+        var server = ioserver.connect();
+        server.on('connect', () => {
             server.on('full_data', (dto: iv.IFullDataDTO) => {
                 this.mineWorldView.setModel(dxo.toMineWorld(dto));
             });

@@ -36,8 +36,8 @@ function server(ipaddress: string, port: number, publicPath: string, router: any
 
     var server = http.createServer(app);
 
-    if (router['io'] != null) {
-        router['io'](socketio(server));
+    if (router['ioHandler'] != null) {
+        router['ioHandler'](socketio(server));
     }
 
     server.listen(port, ipaddress, null,

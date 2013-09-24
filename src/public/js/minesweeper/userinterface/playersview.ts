@@ -49,7 +49,7 @@ class PlayersView {
         private loadQueue: createjs.LoadQueue) {
     }
 
-    move(id: string, coord: Coord) {
+    move(id: number, coord: Coord) {
         this.items[id].move(coord);
     }
 
