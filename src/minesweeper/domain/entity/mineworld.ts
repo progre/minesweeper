@@ -1,41 +1,39 @@
-import Coord = require('./../valueobject/coord');
+import ee2 = require('eventemitter2');
+import Enumerable = require('./../../lib/linq');
+import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
+import playersRepository = require('./../repository/playersrepository');
 import Player = require('./player');
 
 export = MineWorld;
-class MineWorld extends EventEmitter2 {
-    players: { [id: number]: Player } = {};
-
-    /** 何らかの方法でサーバーの状態をロード */
-    static load() {
-    }
-
-    /** デバッグ用 */
-    static createLocal() {
-        var world = new MineWorld();
-        world.addPlayer(0, new Player(Coord.of('0', '0'), 'remilia'));
-        return world;
-    }
+class MineWorld extends ee2.EventEmitter2 {
+    activePlayers: { [key: number]: Player } = {};
 
     constructor() {
         super();
     }
 
-    update() {
+    createPlayer() {
+        var player = new Player(Coord.of('0', '0'), 'remilia');
+        var id = playersRepository.create(player);
+        this.activePlayers[id] = player;
+        super.emit('player_activated', { id: id, player: player });
+        return id;
     }
 
-    addPlayer(id: number, player: Player) {
-        this.players[id] = player;
-        super.emit('player_added', id, player);
+    activatePlayer(id: number) {
+        var player = playersRepository.get(id);
+        this.activePlayers[id] = player;
+        super.emit('player_activated', { id: id, player: player });
     }
 
-    removePlayer(id: number) {
-        var removed = this.players[id];
-        this.players[id] = null;
-        super.emit('player_removed', id, removed);
+    deactivatePlayer(id: number) {
+        var player = this.activePlayers[id];
+        playersRepository.put(id, player);
+        delete this.activePlayers[id];
+        super.emit('player_deactivated', { id: id, player: player });
     }
 
     /** 移動経路確定はサーバー側で行う */
     movePlayer(id: number, coord: Coord) {
-        this.players[id].coord = coord;
     }
 }

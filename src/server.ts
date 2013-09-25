@@ -1,6 +1,7 @@
 /// <reference path="DefinitelyTyped/node/node.d.ts"/>
 /// <reference path="DefinitelyTyped/express/express.d.ts"/>
 /// <reference path="DefinitelyTyped/biginteger.d.ts"/>
+/// <reference path="DefinitelyTyped/eventemitter2-module.d.ts"/>
 
 import fs = require('fs');
 var log4js = require('log4js');

@@ -23,6 +23,8 @@ export declare function from(obj: boolean): IEnumerable<boolean>;
 export declare function from(obj: string): IEnumerable<string>;
 export declare function from<T>(obj: T[]): IEnumerable<T>;
 export declare function from<T>(obj: { length: number;[x: number]: T; }): IEnumerable<T>;
+export declare function from<T>(obj: { [key: string]: T }): IEnumerable<{ key: string; value: T }>;
+export declare function from<T>(obj: { [key: number]: T }): IEnumerable<{ key: number; value: T }>;
 export declare function from(obj: any): IEnumerable<{ key: string; value: any }>;
 export declare function make<T>(element: T): IEnumerable<T>;
 export declare function matches<T>(input: string, pattern: RegExp): IEnumerable<T>;
