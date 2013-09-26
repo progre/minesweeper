@@ -22,6 +22,9 @@ class Server {
     constructor(ipAddress: string, port: number, publicPath: string) {
         // DBからWorldをリストアする予定
         this.mineWorld = new MineWorld();
+        this.mineWorld.on('player_activated', (obj: { id: number; player: Player }) => {
+
+        });
 
         var get = {
         };
@@ -37,13 +40,12 @@ class Server {
                 logger.log('playerId=' + playerId);
 
                 client.join(0); // とりあえずroomに入れておく
-                this.setClientAction(client, io.in(0), playerId, null);
+                this.setClientAction(client, io.in(0), playerId, this.mineWorld.activePlayers[playerId]);
 
                 client.on('disconnect', () => {
                     logger.log('disconnect: ' + client.id);
                     this.store(sessionId);
                 });
-                console.log(this.mineWorld.activePlayers)
                 var data: ifs.IFullDataDTO = {
                     yourId: playerId,
                     activePlayers: dxo.fromActivePlayers(this.mineWorld.activePlayers)
@@ -57,7 +59,6 @@ class Server {
     private restoreOrCreate(userId: string) {
         var user = usersRepository.get(userId);
         var playerId: number;
-        console.log(user)
         if (user != null) {
             playerId = user.playerId;
             this.mineWorld.activatePlayer(playerId);
@@ -77,8 +78,8 @@ class Server {
         client.on('move', (obj: { coord: ifs.ICoordDTO }) => {
             logger.info(obj);
         });
-        client.on('dig', (obj: { coord: ifs.ICoordDTO }) => {
-            player.coord = cdxo.toCoord(obj.coord);
+        client.on('dig', (coord: ifs.ICoordDTO) => {
+            player.coord = cdxo.toCoord(coord);
             room.emit('dig', { id: playerId, coord: cdxo.fromCoord(player.coord) });
         });
         client.on('flag', (obj: { coord: ifs.ICoordDTO }) => {

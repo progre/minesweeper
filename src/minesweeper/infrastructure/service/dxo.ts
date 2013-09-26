@@ -4,6 +4,7 @@ import iv = require('./../../../minesweeper-common/infrastructure/valueobject/in
 import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo');
 
 export function fromActivePlayers(activePlayers: { [key: number]: Player }): IHash<iv.IPlayerDTO> {
+    console.log(activePlayers)
     return Enumerable.from(activePlayers)
         .toObject(x => x.key, x => fromPlayer(x.value));
 }
