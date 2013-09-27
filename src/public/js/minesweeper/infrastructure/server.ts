@@ -8,24 +8,24 @@ var WS_ADDRESS = '127.0.0.1';
 export function connect() {
     var server = io(WS_ADDRESS);
     server.on('connect', () => {
-        server.emit('session_id', getOrCreateSessionId());
+        server.emit('user_id', getOrCreateUserId());
     });
     return server;
 }
 
-function getOrCreateSessionId() {
-    var sessionId = cookie.get('session_id');
-    if (sessionId != null) {
-        return sessionId;
+function getOrCreateUserId() {
+    var userId = cookie.get('user_id');
+    if (userId != null) {
+        return userId;
     }
-    cookie.set('session_id', createSessionId());
-    sessionId = cookie.get('session_id');
-    if (sessionId == null)
+    cookie.set('user_id', createUserId());
+    userId = cookie.get('user_id');
+    if (userId == null)
         throw new Error('cookie is not supported.');
-    return sessionId;
+    return userId;
 }
 
-function createSessionId() {
+function createUserId() {
     // “K“–‚É•³’·‚¢—”‚ğì‚é
     var id = '';
     for (var i = 0; i < 77; i++) {

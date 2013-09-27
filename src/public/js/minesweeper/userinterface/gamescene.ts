@@ -21,36 +21,43 @@ class GameScene implements game.Scene {
         server.on('connect', () => {
             server.on('full_data', (dto: iv.IFullDataDTO) => {
                 this.mineWorldView.setModel(dxo.toMineWorld(dto));
+
+                server.on('moved', (obj: iv.IMoveDTO) => {
+                    this.mineWorldView.activePlayers.move(obj.id, dxo.toCoord(obj.coord));
+                });
+                server.on('digged', (obj: iv.IMoveDTO) => {
+                    this.mineWorldView.activePlayers.move(obj.id, dxo.toCoord(obj.coord));
+                });
+                server.on('flagged', (obj: iv.IMoveDTO) => {
+                    this.mineWorldView.activePlayers.move(obj.id, dxo.toCoord(obj.coord));
+                });
+                server.on('opened', () => {
+                });
+                server.on('flagged', () => {
+                });
+                server.on('bombed', () => {
+                });
+                server.on('player_activated', (obj: { id: number; player: iv.IPlayerDTO }) => {
+                    this.mineWorldView.activePlayers.addPlayer(obj.id, dxo.toPlayer(obj.player));
+                });
+                server.on('player_deactivated', (obj: { id: number; player: iv.IPlayerDTO }) => {
+                    this.mineWorldView.activePlayers.removePlayer(obj.id);
+                });
             });
-            server.on('move', (obj: iv.IMoveDTO) => {
-                this.mineWorldView.players.move(obj.id, dxo.toCoord(obj.coord));
-            });
-            server.on('dig', (obj: iv.IMoveDTO) => {
-                console.log(obj);
-                this.mineWorldView.players.move(obj.id, dxo.toCoord(obj.coord));
-            });
-            server.on('flag', (obj: iv.IMoveDTO) => {
-                this.mineWorldView.players.move(obj.id, dxo.toCoord(obj.coord));
-            });
-            server.on('opened', () => {
-            });
-            server.on('flagged', () => {
-            });
-            server.on('bomb', () => {
-            });
+
             server.on('disconnect', () => {
                 console.log('disconnect');
             });
 
             this.mineWorldView.on('click', (e: { coord: Coord; type: number; }) => {
                 if (false) {
-                    server.emit('move', { coord: dxo.fromCoord(e.coord) });
+                    server.emit('move', dxo.fromCoord(e.coord));
                 }
                 if (e.type === 0) {
-                    server.emit('dig', { coord: dxo.fromCoord(e.coord) });
+                    server.emit('dig', dxo.fromCoord(e.coord));
                 }
                 if (e.type === 2) {
-                    server.emit('flag', { coord: dxo.fromCoord(e.coord) });
+                    server.emit('flag', dxo.fromCoord(e.coord));
                 }
             });
         });
@@ -77,7 +84,7 @@ class GameScene implements game.Scene {
     }
 
     wakeup(size: game.Rect) {
-        this.mineWorldView.size = size;
+        this.mineWorldView.setSize(size);
     }
 
     update(): game.Scene {
@@ -85,7 +92,7 @@ class GameScene implements game.Scene {
     }
 
     resize(size: game.Rect) {
-        this.mineWorldView.size = size;
+        this.mineWorldView.setSize(size);
     }
 
     suspend() {

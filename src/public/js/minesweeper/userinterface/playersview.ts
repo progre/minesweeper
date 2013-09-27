@@ -19,6 +19,7 @@ class PlayerView {
         var ss = new createjs.SpriteSheet(ssOpt);
         this.displayObject = new createjs.BitmapAnimation(ss);
         this.displayObject.gotoAndPlay('walk');
+        this.setCenter(model.coord);
     }
 
     setCenter(value: Coord) {
@@ -53,17 +54,29 @@ class PlayersView {
         this.items[id].move(coord);
     }
 
-    set model(value: ifs.IHash<ifs.IPlayer>) {
+    addPlayer(id: number, value: ifs.IPlayer) {
+        if (this.items[id] != null)
+            return;
+        var playerView = new PlayerView(this.loadQueue, value);
+        this.displayObject.addChild(playerView.displayObject);
+        this.items[id] = playerView;
+    }
+
+    removePlayer(id: number) {
+        var playerView = this.items[id];
+        this.displayObject.removeChild(playerView.displayObject);
+        delete this.items[id];
+    }
+
+    setModel(value: { [key: number]: ifs.IPlayer }) {
         // players‚É“ü‚Á‚Ä‚é‚â‚Â‚ð•\Ž¦
-        Enumerable.from(value).forEach((x: { key: string; value: ifs.IPlayer }) => {
-            var playerView = new PlayerView(this.loadQueue, x.value);
-            this.displayObject.addChild(playerView.displayObject);
-            this.items[x.key] = playerView;
+        Enumerable.from(value).forEach(x => {
+            this.addPlayer(x.key, x.value);
         });
     }
 
-    set center(value: Coord) {
-        Enumerable.from(this.items).forEach((x: { key: string; value: PlayerView }) => {
+    setCenter(value: Coord) {
+        Enumerable.from(this.items).forEach(x => {
             x.value.setCenter(value);
         });
     }

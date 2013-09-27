@@ -10,7 +10,8 @@
     "mongodb": "*",
     "clone": "*",
     "socket.io": "git://github.com/LearnBoost/socket.io",
-    "biginteger": "~1.0.1"
+    "biginteger": "~1.0.1",
+    "eventemitter2": "~0.4.13"
   },
   "devDependencies": {
     "tsd": "*",

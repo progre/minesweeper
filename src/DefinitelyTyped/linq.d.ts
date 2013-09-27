@@ -25,6 +25,7 @@ declare module linqjs {
         from(obj: string): IEnumerable<string>;
         from<T>(obj: T[]): IEnumerable<T>;
         from<T>(obj: { length: number;[x: number]: T; }): IEnumerable<T>;
+        from<T>(obj: { [key: number]: T }): IEnumerable<{ key: number; value: T }>;
         from(obj: any): IEnumerable<{ key: string; value: any }>;
         make<T>(element: T): IEnumerable<T>;
         matches<T>(input: string, pattern: RegExp): IEnumerable<T>;

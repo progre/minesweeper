@@ -1,5 +1,5 @@
-import Enumerable = require('./../../../lib/linq');
-import Player = require('./../entity/player');
+import Enumerable = require('./../../lib/linq');
+import Player = require('./../domain/entity/player');
 
 export = playersRepository;
 module playersRepository {
