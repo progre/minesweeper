@@ -1,14 +1,13 @@
 import Coord = require('./../../minesweeper-common/domain/valueobject/coord');
 import ifs = require('./../../minesweeper-common/domain/entity/interfaces');
+import Camera = require('./../domain/camera');
 
 class PlayerView {
     static resourceFiles = ['/img/remilia.png'];
 
     displayObject: createjs.BitmapAnimation;
-    private coord = Coord.of('0', '0');
-    private center = Coord.of('0', '0');
 
-    constructor(private loadQueue: createjs.LoadQueue, private model: ifs.IPlayer) {
+    constructor(private loadQueue: createjs.LoadQueue, private model: ifs.IPlayer, private camera: Camera) {
         var ssOpt = {
             images: [this.loadQueue.getResult('/img/remilia.png')],
             frames: { width: 32, height: 32 },
@@ -19,23 +18,22 @@ class PlayerView {
         var ss = new createjs.SpriteSheet(ssOpt);
         this.displayObject = new createjs.BitmapAnimation(ss);
         this.displayObject.gotoAndPlay('walk');
-        this.setCenter(model.coord);
-    }
 
-    setCenter(value: Coord) {
-        this.center = value;
         this.updatePosition();
+        camera.on('moved', () => {
+            this.updatePosition();
+        });
     }
 
     move(coord: Coord) {
-        this.coord = coord;
+        this.model.coord = coord;
         this.updatePosition();
     }
 
     private updatePosition() {
-        var fixed = this.coord.subtract(this.center);
-        this.displayObject.x = fixed.xJSValue * 32 - 16;
-        this.displayObject.y = fixed.yJSValue * 32 - 24;
+        var pos = this.camera.fromAbsoluteToDisplay(this.model.coord);
+        this.displayObject.x = pos.x;
+        this.displayObject.y = pos.y - 8;
     }
 }
 
@@ -45,9 +43,11 @@ class PlayersView {
 
     displayObject = new createjs.Container();
     private items: ifs.IHash<PlayerView> = {};
+    private center: Coord;
 
     constructor(
-        private loadQueue: createjs.LoadQueue) {
+        private loadQueue: createjs.LoadQueue,
+        private camera: Camera) {
     }
 
     move(id: number, coord: Coord) {
@@ -57,7 +57,7 @@ class PlayersView {
     addPlayer(id: number, value: ifs.IPlayer) {
         if (this.items[id] != null)
             return;
-        var playerView = new PlayerView(this.loadQueue, value);
+        var playerView = new PlayerView(this.loadQueue, value, this.camera);
         this.displayObject.addChild(playerView.displayObject);
         this.items[id] = playerView;
     }
@@ -72,12 +72,6 @@ class PlayersView {
         // players‚É“ü‚Á‚Ä‚é‚â‚Â‚ð•\Ž¦
         Enumerable.from(value).forEach(x => {
             this.addPlayer(x.key, x.value);
-        });
-    }
-
-    setCenter(value: Coord) {
-        Enumerable.from(this.items).forEach(x => {
-            x.value.setCenter(value);
         });
     }
 }

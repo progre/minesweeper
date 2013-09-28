@@ -1,6 +1,7 @@
 import game = require('./../../framework/game');
 import Coord = require('./../../minesweeper-common/domain/valueobject/coord');
 import ifs = require('./../../minesweeper-common/domain/entity/interfaces');
+import Camera = require('./../domain/camera');
 import PlayersView = require('./playersview');
 
 class BlocksView {
@@ -65,22 +66,21 @@ class MineWorldView extends EventEmitter2 {
     private blocks: BlocksView;
     activePlayers: PlayersView;
     private size = new game.Rect(0, 0);
-    /** row-colÀ•WŒn */
-    private center = Coord.of('0', '0');
+    private camera = new Camera(Coord.of('0', '0'));
 
     constructor(private loadQueue: createjs.LoadQueue) {
         super();
         this.displayObject.addChild(this.clickObject);
         this.blocks = new BlocksView(loadQueue);
         this.displayObject.addChild(this.blocks.backDisplayObject);
-        this.activePlayers = new PlayersView(loadQueue);
+        this.activePlayers = new PlayersView(loadQueue, this.camera);
         this.displayObject.addChild(this.activePlayers.displayObject);
 
         this.clickObject.addEventListener('click', (eventObj: any) => {
-            var col = Math.round((eventObj.stageX - (this.size.width >> 1)) / 32);
-            var row = Math.round((eventObj.stageY - (this.size.height >> 1)) / 32);
             super.emit('click', {
-                coord: Coord.fromNumber(col, row).add(this.center),
+                coord: this.camera.fromDisplayToAbsolute(
+                    eventObj.stageX - (this.size.width >> 1),
+                    eventObj.stageY - (this.size.height >> 1)),
                 type: eventObj.nativeEvent.button
             });
         });
@@ -92,13 +92,8 @@ class MineWorldView extends EventEmitter2 {
     }
 
     setModel(model: ifs.IMineWorld) {
+        this.camera.setCenter(model.players[model.yourId].coord);
         this.activePlayers.setModel(model.players);
-        this.setCenter(model.players[model.yourId].coord);
-    }
-
-    private setCenter(value: Coord) {
-        this.center = value;
-        this.activePlayers.setCenter(value);
     }
 
     private moveCenter(x: number, y: number) {
