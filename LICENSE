@@ -18,3 +18,29 @@ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+----------------------------------------------------------------
+
+
+cookie.min.js
+----
+
+see also: https://github.com/js-coder/cookie.js
+
+
+jsbn.js
+----
+
+see also: http://www-cs-students.stanford.edu/~tjw/jsbn/
+
+
+linq.js & linq.min.js
+----
+
+see also: http://linqjs.codeplex.com/
+
+
+socket.io-client.js
+----
+
+see also: https://github.com/LearnBoost/socket.io-client

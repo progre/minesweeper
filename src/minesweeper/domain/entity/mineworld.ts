@@ -1,10 +1,10 @@
 var log4js = require('log4js');
 import events = require('events');
-import Enumerable = require('./../../lib/linq');
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
 import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo');
 import playersRepository = require('./../../infrastructure/playersrepository');
 import dxo = require('./../../infrastructure/dxo');
+import Map = require('./map');
 import Player = require('./player');
 
 var logger = log4js.getLogger();

@@ -21,8 +21,8 @@ class Camera extends EventEmitter2 {
     fromAbsoluteToDisplay(target: Coord) {
         var relative = this.fromAbsoluteToRelative(target);
         return {
-            x: relative.xJSValue * 32 - 16,
-            y: relative.yJSValue * 32 - 16
+            x: relative.xIntValue * 32 - 16,
+            y: relative.yIntValue * 32 - 16
         };
     }
 

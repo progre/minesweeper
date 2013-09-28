@@ -1,6 +1,6 @@
 declare var io;
 declare var cookie;
-import bi = require('biginteger');
+import BigInteger = require('jsbn');
 
 var WS_ADDRESS = '127.0.0.1';
 //var WS_ADDRESS = ':8000';
@@ -31,7 +31,7 @@ function createUserId() {
     for (var i = 0; i < 77; i++) {
         id += random10();
     }
-    return new bi.BigInteger(id).toString(36);
+    return new BigInteger(id).toString(36);
 }
 
 function random10() {

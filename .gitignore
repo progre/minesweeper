@@ -10,3 +10,5 @@ secret.json
 
 !Gruntfile.js
 !/lib/*.js
+!/lib/*.js
+!public/js/lib/*.js
