@@ -40,18 +40,18 @@ class MineWorld {
         if (player == null) {
             console.log(id);
             console.log(this.activePlayers);
-            throw new Error('‚ß‚Á‚½‚É‚¨‚«‚È‚¢‚¯‚Ç‚¨‚«‚é');
+            throw new Error('ã‚ã£ãŸã«ãŠããªã„ã‘ã©ãŠãã‚‹');
         }
         playersRepository.put(id, player);
         delete this.activePlayers[id];
         this.emitter.emit('player_deactivated', { id: id, player: dxo.fromPlayer(player) });
     }
 
-    /** ˆÚ“®Œo˜HŠm’è‚ÍƒT[ƒo[‘¤‚Ås‚¤ */
+    /** ç§»å‹•çµŒè·¯ç¢ºå®šã¯ã‚µãƒ¼ãƒãƒ¼å´ã§è¡Œã† */
     movePlayer(id: number, coord: Coord) {
     }
 
-    /** ˆÚ“®Œo˜HŠm’è‚ÍƒT[ƒo[‘¤‚Ås‚¤ */
+    /** ç§»å‹•çµŒè·¯ç¢ºå®šã¯ã‚µãƒ¼ãƒãƒ¼å´ã§è¡Œã† */
     digPlayer(id: number, coord: Coord) {
         if (this.activePlayers[id] == null) {
             logger.warn('player not found: ' + id);
