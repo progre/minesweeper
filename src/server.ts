@@ -5,7 +5,7 @@
 
 import fs = require('fs');
 var log4js = require('log4js');
-import Server = require('./minesweeper/server');
+import Server = require('./minesweeper/application/server');
 
 var LOG_DIRECTORY = __dirname + '/log'
 if (!fs.existsSync(LOG_DIRECTORY)) {

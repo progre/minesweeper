@@ -12,6 +12,7 @@ var logger = log4js.getLogger();
 export = MineWorld;
 class MineWorld {
     activePlayers: { [key: number]: Player } = {};
+    map = new Map();
 
     constructor(
         private emitter: events.EventEmitter) {

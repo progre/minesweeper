@@ -1,9 +1,9 @@
 var log4js = require('log4js');
-import ifs = require('./../../../minesweeper-common/infrastructure/valueobject/interfaces');
-import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo');
-import usersRepository = require('./../../infrastructure/usersrepository');
-import dxo = require('./../../infrastructure/dxo');
-import MineWorld = require('./mineworld');
+import ifs = require('./../../minesweeper-common/infrastructure/valueobject/interfaces');
+import cdxo = require('./../../minesweeper-common/infrastructure/service/dxo');
+import usersRepository = require('./../infrastructure/usersrepository');
+import dxo = require('./../infrastructure/dxo');
+import MineWorld = require('./../domain/entity/mineworld');
 
 var logger = log4js.getLogger();
 
@@ -21,7 +21,7 @@ class Client {
             this.restoreOrCreatePlayerId();
 
             client.join(0); // とりあえずroomに入れておく
-            this.setClientAction();
+            this.setEvents();
 
             client.on('disconnect', () => {
                 logger.log('disconnect: ' + client.id);
@@ -33,19 +33,6 @@ class Client {
                 activePlayers: dxo.fromActivePlayers(this.mineWorld.activePlayers)
             };
             client.emit('full_data', data);
-        });
-    }
-
-    private setClientAction() {
-        this.client.on('move', (coord: ifs.ICoordDTO) => {
-            logger.info(coord);
-        });
-        this.client.on('dig', (coord: ifs.ICoordDTO) => {
-            console.log(coord.x, coord.y)
-            this.mineWorld.digPlayer(this.playerId, cdxo.toCoord(coord));
-        });
-        this.client.on('flag', (coord: ifs.ICoordDTO) => {
-            logger.info(coord);
         });
     }
 
@@ -62,5 +49,24 @@ class Client {
 
     private store() {
         this.mineWorld.deactivatePlayer(this.playerId);
+    }
+
+    private setEvents() {
+        // chunkのリスナーに追加。defectするまでchunkの変更を通知する
+        this.client.on('join_chunk', (coord: ifs.ICoordDTO) => {
+            this.client.emit('chunk', this.mineWorld.map.getViewPointChunk(cdxo.toCoord(coord)));
+        });
+        this.client.on('defect_chunk', () => {
+        });
+        this.client.on('move', (coord: ifs.ICoordDTO) => {
+            logger.info(coord);
+        });
+        this.client.on('dig', (coord: ifs.ICoordDTO) => {
+            console.log(coord.x, coord.y)
+            this.mineWorld.digPlayer(this.playerId, cdxo.toCoord(coord));
+        });
+        this.client.on('flag', (coord: ifs.ICoordDTO) => {
+            logger.info(coord);
+        });
     }
 }
