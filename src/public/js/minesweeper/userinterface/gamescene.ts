@@ -54,6 +54,7 @@ class GameScene implements game.Scene {
                     server.emit('move', dxo.fromCoord(e.coord));
                 }
                 if (e.type === 0) {
+                    console.log(dxo.fromCoord(e.coord)); // スリープ復帰とかに吹っ切れる
                     server.emit('dig', dxo.fromCoord(e.coord));
                 }
                 if (e.type === 2) {
