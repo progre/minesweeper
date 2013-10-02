@@ -1,6 +1,6 @@
 import Coord = require('./../../minesweeper-common/domain/valueobject/coord');
 import ifs = require('./../../minesweeper-common/domain/entity/interfaces');
-import Camera = require('./../domain/camera');
+import Camera = require('./../domain/entity/camera');
 
 class PlayerView {
     static resourceFiles = ['/img/remilia.png'];

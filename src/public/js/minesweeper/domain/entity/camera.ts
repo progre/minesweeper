@@ -1,4 +1,4 @@
-import Coord = require('./../../minesweeper-common/domain/valueobject/coord');
+import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
 
 export = Camera;
 class Camera extends EventEmitter2 {

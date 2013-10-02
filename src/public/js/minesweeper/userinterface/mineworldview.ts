@@ -1,7 +1,8 @@
 import game = require('./../../framework/game');
 import Coord = require('./../../minesweeper-common/domain/valueobject/coord');
 import ifs = require('./../../minesweeper-common/domain/entity/interfaces');
-import Camera = require('./../domain/camera');
+import Camera = require('./../domain/entity/camera');
+import ClientMap = require('./../domain/entity/clientmap');
 import PlayersView = require('./playersview');
 
 class BlocksView {
@@ -9,6 +10,7 @@ class BlocksView {
 
     backDisplayObject = new createjs.Container();
     private templateBlock: createjs.BitmapAnimation;
+    private map = new ClientMap();
 
     constructor(private loadQueue: createjs.LoadQueue) {
         this.templateBlock = this.createTemplate(loadQueue);
