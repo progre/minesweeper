@@ -4,15 +4,15 @@ import Coord = require('./../../../minesweeper-common/domain/valueobject/coord')
 import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo');
 import playersRepository = require('./../../infrastructure/playersrepository');
 import dxo = require('./../../infrastructure/dxo');
-import Map = require('./map');
 import Player = require('./player');
+import ServerMap = require('./servermap');
 
 var logger = log4js.getLogger();
 
 export = MineWorld;
 class MineWorld {
     activePlayers: { [key: number]: Player } = {};
-    map = new Map();
+    map = new ServerMap();
 
     constructor(
         private emitter: events.EventEmitter) {
