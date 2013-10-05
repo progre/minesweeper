@@ -26,12 +26,8 @@ class PlayerView {
         });
     }
 
-    move(coord: Coord) {
-        this.model.coord = coord;
-        this.updatePosition();
-    }
-
-    private updatePosition() {
+    updatePosition() {
+        console.log(this.model.coord.xString, this.model.coord.yString);
         var pos = this.camera.fromAbsoluteToDisplay(this.model.coord);
         this.displayObject.x = pos.x;
         this.displayObject.y = pos.y - 8;
@@ -47,6 +43,9 @@ class PlayersView {
     private center: Coord;
 
     constructor(private loadQueue: createjs.LoadQueue, private camera: Camera, private activePlayers: ActivePlayers) {
+        activePlayers.on('player_moved', (id: number) => {
+            this.items[id].updatePosition();
+        });
         activePlayers.on('player_added', (obj: { id: number; player: ifs.IPlayer }) => {
             var playerView = new PlayerView(this.loadQueue, obj.player, this.camera);
             this.displayObject.addChild(playerView.displayObject);

@@ -41,9 +41,9 @@ class MineWorldView {
             }
         });
 
+        this.displayObject.addChild(this.clickObject);
         this.displayObject.addChild(this.landformView.backDisplayObject);
         this.displayObject.addChild(this.activePlayersView.displayObject);
-        this.displayObject.addChild(this.clickObject);
     }
 
     /** •`‰æƒGƒŠƒAŽw’è */

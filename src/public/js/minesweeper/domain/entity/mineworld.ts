@@ -11,7 +11,7 @@ class MineWorld {
     activePlayers = new ActivePlayers();
     landform = new Landform();
     /** infrastructure */
-    /** ƒCƒxƒ“ƒgóM—p */
+    /** ã‚¤ãƒ™ãƒ³ãƒˆå—ä¿¡ç”¨ */
     private emitter: ee2.EventEmitter2;
 
     setEmitter(emitter: ee2.EventEmitter2) {
@@ -39,7 +39,7 @@ class MineWorld {
     }
 
     dig(coord: Coord) {
-        console.log(cdxo.fromCoord(coord)); // ƒXƒŠ[ƒv•œ‹A‚Æ‚©‚É‚ÁØ‚ê‚é
+        console.log(cdxo.fromCoord(coord)); // ã‚¹ãƒªãƒ¼ãƒ—å¾©å¸°ã¨ã‹ã«å¹ã£åˆ‡ã‚Œã‚‹
         this.emitter.emit('dig', cdxo.fromCoord(coord));
     }
 

@@ -15,13 +15,18 @@ class ActivePlayers extends ee2.EventEmitter2 {
     setEmitter(emitter: ee2.EventEmitter2) {
         emitter.on('moved', (obj: iv.IMoveDTO) => {
             this.items[obj.id].coord = cdxo.toCoord(obj.coord);
+            super.emit('player_moved', obj.id);
         });
         // TODO: ‚±‚Ì•Ó‚Ímoved‚ª‚ ‚ê‚Î‚¢‚ç‚È‚¢
         emitter.on('digged', (obj: iv.IMoveDTO) => {
+            console.log(obj.coord);
             this.items[obj.id].coord = cdxo.toCoord(obj.coord);
+            console.log(this.items[obj.id].coord.xString, this.items[obj.id].coord.yString);
+            super.emit('player_moved', obj.id);
         });
         emitter.on('flagged', (obj: iv.IMoveDTO) => {
             this.items[obj.id].coord = cdxo.toCoord(obj.coord);
+            super.emit('player_moved', obj.id);
         });
         emitter.on('player_activated', (obj: { id: number; player: iv.IPlayerDTO }) => {
             var player = cdxo.toPlayer(obj.player);
