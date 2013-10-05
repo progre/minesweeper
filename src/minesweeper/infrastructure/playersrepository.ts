@@ -3,11 +3,11 @@ import Player = require('./../domain/entity/player');
 
 export = playersRepository;
 module playersRepository {
-    /** DB‚È‚ñ‚©–³‚©‚Á‚½ */
+    /** DBãªã‚“ã‹ç„¡ã‹ã£ãŸ */
     var players: IHash<Player> = {};
 
-    export function get(id: number) {
-        return players[id];
+    export function get(id: number, emitter: EventEmitter) {
+        return new Player(players[id].coord, players[id].image, emitter);
     }
 
     export function put(id: number, player: Player) {

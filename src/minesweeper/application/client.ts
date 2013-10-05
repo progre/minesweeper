@@ -18,10 +18,9 @@ class Client {
             this.userId = userId;
 
             // ユーザーデータをリストア
-            this.restoreOrCreatePlayerId();
+            this.restoreOrCreatePlayerId(client);
 
             client.join(0); // とりあえずroomに入れておく
-            this.setEvents();
 
             client.on('disconnect', () => {
                 logger.log('disconnect: ' + client.id);
@@ -36,37 +35,18 @@ class Client {
         });
     }
 
-    private restoreOrCreatePlayerId() {
+    private restoreOrCreatePlayerId(client: EventEmitter) {
         var user = usersRepository.get(this.userId);
-        if (user != null) {
-            this.mineWorld.activatePlayer(user.playerId);
-            this.playerId = user.playerId;
-        } else {
+        if (user == null) {
             this.playerId = this.mineWorld.createPlayer();
             usersRepository.create(this.userId, { playerId: this.playerId });
+            user = usersRepository.get(this.userId);
         }
+        this.mineWorld.activatePlayer(user.playerId, client);
+        this.playerId = user.playerId;
     }
 
     private store() {
         this.mineWorld.deactivatePlayer(this.playerId);
-    }
-
-    private setEvents() {
-        // chunkのリスナーに追加。defectするまでchunkの変更を通知する
-        this.client.on('join_chunk', (coord: ifs.ICoordDTO) => {
-            this.client.emit('chunk', this.mineWorld.map.getViewPointChunk(cdxo.toCoord(coord)));
-        });
-        this.client.on('defect_chunk', () => {
-        });
-        this.client.on('move', (coord: ifs.ICoordDTO) => {
-            logger.info(coord);
-        });
-        this.client.on('dig', (coord: ifs.ICoordDTO) => {
-            console.log(coord.x, coord.y)
-            this.mineWorld.digPlayer(this.playerId, cdxo.toCoord(coord));
-        });
-        this.client.on('flag', (coord: ifs.ICoordDTO) => {
-            logger.info(coord);
-        });
     }
 }

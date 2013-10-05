@@ -1,26 +1,22 @@
 import MapBase = require('./../../../minesweeper-common/domain/entity/mapbase');
 import vp = require('./../../../minesweeper-common/domain/valueobject/viewpoint');
+import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
 
 export = ServerMap;
 class ServerMap extends MapBase {
-    constructor() {
-        super(key => {
-            var chunk = getFromRepository(key);
+    /** override */
+    /** @protected */
+    requestViewPointChunk(coord: Coord) {
+        // DBに取りに行ったり
+        (callback => callback(null))((chunk: vp.ViewPoint[][]) => {
             if (chunk == null) {
-                // 生成してリポジトリに書き込み
                 chunk = createViewPointChunk();
-                putToRepository(key, chunk);
+                // DBに書き込む？
             }
-            return chunk;
+            this.viewPointChunks.putByCoord(coord, chunk);
+            super.emit('chunk', { coord: coord, chunk: chunk });
         });
     }
-}
-
-function getFromRepository(key: string) {
-    return null;
-}
-
-function putToRepository(key: string, value: any) {
 }
 
 /** 16x16の地形を作成する */
@@ -30,8 +26,8 @@ function createViewPointChunk(): vp.ViewPoint[][] {
         var line = [];
         for (var x = 0; x < 16; x++) {
             line.push(new vp.ViewPoint(
-                Math.random() < 0.4 ? vp.Landform.Bomb : vp.Landform.None,
-                vp.Status.Close));
+                Math.random() < 0.4 ? vp.Landform.BOMB : vp.Landform.NONE,
+                vp.Status.CLOSE));
         }
         chunk.push(line);
     }

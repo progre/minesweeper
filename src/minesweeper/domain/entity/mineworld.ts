@@ -1,5 +1,4 @@
 var log4js = require('log4js');
-import events = require('events');
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
 import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo');
 import playersRepository = require('./../../infrastructure/playersrepository');
@@ -15,24 +14,30 @@ class MineWorld {
     map = new ServerMap();
 
     constructor(
-        private emitter: events.EventEmitter) {
+        /** プレイヤー全体に通知するemitter */
+        private emitter: EventEmitter) {
     }
 
+    /** プレイヤーを作ってリポジトリに保存する */
     createPlayer() {
-        var player = new Player(Coord.of('0', '0'), 'remilia');
-        var id = playersRepository.create(player);
-        this.activePlayers[id] = player;
-        if (player == null)
-            throw new Error();
-        this.emitter.emit('player_activated', { id: id, player: dxo.fromPlayer(player) });
-        return id;
+        var player = new Player(Coord.of('0', '0'), 'remilia', null);
+        return playersRepository.create(player);
     }
 
-    activatePlayer(id: number) {
-        var player = playersRepository.get(id);
-        this.activePlayers[id] = player;
+    activatePlayer(id: number, emitter: EventEmitter) {
+        var player = playersRepository.get(id, emitter);
         if (player == null)
             throw new Error();
+        this.activePlayers[id] = player;
+        player.on('digged', (coord: Coord) => {
+            this.emitter.emit('digged', { id: id, coord: cdxo.fromCoord(coord) });
+        });
+        player.on('join_chunk', (coord: Coord) => {
+            var chunk = this.map.getViewPointChunk(coord);
+            if (chunk != null) {
+                player.putChunk(chunk);
+            }
+        });
         this.emitter.emit('player_activated', { id: id, player: dxo.fromPlayer(player) });
     }
 
@@ -44,20 +49,8 @@ class MineWorld {
             throw new Error('めったにおきないけどおきる');
         }
         playersRepository.put(id, player);
+        player.dispose();
         delete this.activePlayers[id];
         this.emitter.emit('player_deactivated', { id: id, player: dxo.fromPlayer(player) });
-    }
-
-    /** 移動経路確定はサーバー側で行う */
-    movePlayer(id: number, coord: Coord) {
-    }
-
-    /** 移動経路確定はサーバー側で行う */
-    digPlayer(id: number, coord: Coord) {
-        if (this.activePlayers[id] == null) {
-            logger.warn('player not found: ' + id);
-        }
-        this.activePlayers[id].coord = coord;
-        this.emitter.emit('digged', { id: id, coord: cdxo.fromCoord(coord) });
     }
 }
