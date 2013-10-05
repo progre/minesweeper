@@ -3,12 +3,12 @@ import ViewPoint = require('./../../minesweeper-common/domain/valueobject/viewpo
 import iv = require('./../../minesweeper-common/infrastructure/valueobject/interfaces');
 import dxo = require('./../../minesweeper-common/infrastructure/service/dxo');
 import ioserver = require('./../infrastructure/server');
-import MineWorldView = require('./../userinterface/mineworldview');// ˆá–@QÆ
+import MineWorldView = require('./../userinterface/mineworldview');// é•æ³•å‚ç…§
 
 export = Client;
 class Client {
     constructor(private mineWorldView:MineWorldView) {
-        // ƒT[ƒo[‚ÉÚ‘±
+        // ã‚µãƒ¼ãƒãƒ¼ã«æ¥ç¶š
         var server = ioserver.connect();
         server.on('connect', () => {
             server.on('full_data', (dto: iv.IFullDataDTO) => {
@@ -49,7 +49,7 @@ class Client {
                     server.emit('move', dxo.fromCoord(e.coord));
                 }
                 if (e.type === 0) {
-                    console.log(dxo.fromCoord(e.coord)); // ƒXƒŠ[ƒv•œ‹A‚Æ‚©‚É‚ÁØ‚ê‚é
+                    console.log(dxo.fromCoord(e.coord)); // ã‚¹ãƒªãƒ¼ãƒ—å¾©å¸°ã¨ã‹ã«å¹ã£åˆ‡ã‚Œã‚‹
                     server.emit('dig', dxo.fromCoord(e.coord));
                 }
                 if (e.type === 2) {

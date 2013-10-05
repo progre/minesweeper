@@ -1,7 +1,8 @@
+import ee2 = require('eventemitter2');
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
 
 export = Camera;
-class Camera extends EventEmitter2 {
+class Camera extends ee2.EventEmitter2 {
     constructor(
         private center: Coord) {
         super();
