@@ -10,6 +10,26 @@ export function connect() {
     server.on('connect', () => {
         server.emit('user_id', getOrCreateUserId());
     });
+    server.on('connect_error', err => {
+        console.log('error');
+        console.log(err);
+    });
+    server.on('connect_timeout', hoge => {
+        console.log('timeout');
+        console.log(hoge);
+    });
+    server.on('reconnect', (attempt: number) => {
+        console.log('reconnect');
+        console.log(attempt);
+    });
+    server.on('reconnect_error', err => {
+        console.log('reconnect_error');
+        console.log(err);
+    });
+    server.on('reconnect_failed', hoge => {
+        console.log('reconnect_failed');
+        console.log(hoge);
+    });
     return server;
 }
 

@@ -1,14 +1,14 @@
 import game = require('./../../framework/game');
-import ClientMap = require('./../domain/entity/clientmap');
+import Landform = require('./../domain/entity/landform');
 
-export = BlocksView;
-class BlocksView {
+export = LandformView;
+class LandformView {
     static resourceFiles = ['/img/block.png'];
 
     backDisplayObject = new createjs.Container();
     private templateBlock: createjs.BitmapAnimation;
 
-    constructor(private loadQueue: createjs.LoadQueue, private map: ClientMap) {
+    constructor(private loadQueue: createjs.LoadQueue, private landform: Landform) {
         this.templateBlock = this.createTemplate(loadQueue);
         this.templateBlock.gotoAndPlay('open');
     }

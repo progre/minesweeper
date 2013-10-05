@@ -1,52 +1,55 @@
 import ee2 = require('eventemitter2');
 import game = require('./../../framework/game');
 import Coord = require('./../../minesweeper-common/domain/valueobject/coord');
-import ifs = require('./../../minesweeper-common/domain/entity/interfaces');
-import Camera = require('./../domain/entity/camera');
-import ClientMap = require('./../domain/entity/clientmap');
-import PlayersView = require('./playersview');
-import BlocksView = require('./blocksview');
+import MineWorld = require('./../domain/entity/mineworld');
+import Camera = require('./entity/camera');
+import ActivePlayersView = require('./activeplayersview');
+import LandformView = require('./landformview');
 
 export = MineWorldView;
-class MineWorldView extends ee2.EventEmitter2 {
-    static resourceFiles = PlayersView.resourceFiles;
+class MineWorldView {
+    static resourceFiles = ActivePlayersView.resourceFiles;
 
     displayObject = new createjs.Container();
     private clickObject = createWall();
-    private blocks: BlocksView;
-    activePlayers: PlayersView;
+    private landformView: LandformView;
+    private activePlayersView: ActivePlayersView;
     private size = new game.Rect(0, 0);
     private camera = new Camera(Coord.of('0', '0'));
 
-    constructor(private loadQueue: createjs.LoadQueue, map: ClientMap) {
-        super();
-        this.displayObject.addChild(this.clickObject);
-        this.blocks = new BlocksView(loadQueue, map);
-        this.displayObject.addChild(this.blocks.backDisplayObject);
-        this.activePlayers = new PlayersView(loadQueue, this.camera);
-        this.displayObject.addChild(this.activePlayers.displayObject);
+    constructor(private loadQueue: createjs.LoadQueue, private mineWorld: MineWorld) {
+        this.landformView = new LandformView(loadQueue, mineWorld.landform);
+        this.activePlayersView = new ActivePlayersView(loadQueue, this.camera, mineWorld.activePlayers);
+
+        this.mineWorld.activePlayers.on('central_player_selected', (id: number) => {
+            this.camera.setCenter(mineWorld.activePlayers.get(id).coord);
+        });
 
         this.clickObject.addEventListener('click', (eventObj: any) => {
-            super.emit('click', {
-                coord: this.camera.fromDisplayToAbsolute(
-                    eventObj.stageX - (this.size.width >> 1),
-                    eventObj.stageY - (this.size.height >> 1)),
-                type: eventObj.nativeEvent.button
-            });
+            var coord = this.camera.fromDisplayToAbsolute(
+                eventObj.stageX - (this.size.width >> 1),
+                eventObj.stageY - (this.size.height >> 1));
+            var type = eventObj.nativeEvent.button;
+            if (false) {
+                mineWorld.move(coord);
+            }
+            if (type === 0) {
+                mineWorld.dig(coord);
+            }
+            if (type === 2) {
+                mineWorld.flag(coord);
+            }
         });
+
+        this.displayObject.addChild(this.landformView.backDisplayObject);
+        this.displayObject.addChild(this.activePlayersView.displayObject);
+        this.displayObject.addChild(this.clickObject);
     }
 
+    /** •`‰æƒGƒŠƒAŽw’è */
     setSize(value: game.Rect) {
         this.size = value;
-        this.blocks.size = value;
-    }
-
-    setModel(model: ifs.IMineWorld) {
-        this.camera.setCenter(model.players[model.yourId].coord);
-        this.activePlayers.setModel(model.players);
-    }
-
-    private moveCenter(x: number, y: number) {
+        this.landformView.setSize(value);
     }
 }
 

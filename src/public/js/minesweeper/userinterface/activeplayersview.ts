@@ -1,6 +1,7 @@
 import Coord = require('./../../minesweeper-common/domain/valueobject/coord');
 import ifs = require('./../../minesweeper-common/domain/entity/interfaces');
-import Camera = require('./../domain/entity/camera');
+import ActivePlayers = require('./../domain/entity/activeplayers');
+import Camera = require('./entity/camera');
 
 class PlayerView {
     static resourceFiles = ['/img/remilia.png'];
@@ -45,33 +46,15 @@ class PlayersView {
     private items: ifs.IHash<PlayerView> = {};
     private center: Coord;
 
-    constructor(
-        private loadQueue: createjs.LoadQueue,
-        private camera: Camera) {
-    }
-
-    move(id: number, coord: Coord) {
-        this.items[id].move(coord);
-    }
-
-    addPlayer(id: number, value: ifs.IPlayer) {
-        if (this.items[id] != null)
-            return;
-        var playerView = new PlayerView(this.loadQueue, value, this.camera);
-        this.displayObject.addChild(playerView.displayObject);
-        this.items[id] = playerView;
-    }
-
-    removePlayer(id: number) {
-        var playerView = this.items[id];
-        this.displayObject.removeChild(playerView.displayObject);
-        delete this.items[id];
-    }
-
-    setModel(value: { [key: number]: ifs.IPlayer }) {
-        // players‚É“ü‚Á‚Ä‚é‚â‚Â‚ð•\Ž¦
-        Enumerable.from(value).forEach(x => {
-            this.addPlayer(x.key, x.value);
+    constructor(private loadQueue: createjs.LoadQueue, private camera: Camera, private activePlayers: ActivePlayers) {
+        activePlayers.on('player_added', (obj: { id: number; player: ifs.IPlayer }) => {
+            var playerView = new PlayerView(this.loadQueue, obj.player, this.camera);
+            this.displayObject.addChild(playerView.displayObject);
+            this.items[obj.id] = playerView;
+        });
+        activePlayers.on('player_removed', (id: number) => {
+            this.displayObject.removeChild(this.items[id].displayObject);
+            delete this.items[id];
         });
     }
 }

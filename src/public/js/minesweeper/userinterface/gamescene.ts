@@ -1,10 +1,6 @@
 import game = require('./../../framework/game');
-import Coord = require('./../../minesweeper-common/domain/valueobject/coord');
-import iv = require('./../../minesweeper-common/infrastructure/valueobject/interfaces');
-import dxo = require('./../../minesweeper-common/infrastructure/service/dxo');
-import Client = require('./../application/client');
-import Server = require('./../application/server');
 import ioserver = require('./../infrastructure/server');
+import MineWorld = require('./../domain/entity/mineworld');
 import MineWorldView = require('./mineworldview');
 
 export = GameScene;
@@ -12,12 +8,21 @@ class GameScene implements game.Scene {
     static resourceFiles = ['/img/block.png'].concat(MineWorldView.resourceFiles);
 
     displayObject = new createjs.Container();
+    private mineWorld = new MineWorld();
     private mineWorldView: MineWorldView;
 
     constructor(loadQueue: createjs.LoadQueue) {
-        this.mineWorldView = new MineWorldView(loadQueue);
+        // サーバーに接続
+        var server = ioserver.connect();
+        server.on('connect', () => {
+            server.on('disconnect', () => {
+                console.log('disconnect');
+            });
+            this.mineWorld.setEmitter(server);
+        });
+
+        this.mineWorldView = new MineWorldView(loadQueue, this.mineWorld);
         this.displayObject.addChild(this.mineWorldView.displayObject);
-        new Client(this.mineWorldView);
     }
 
     wakeup(size: game.Rect) {
