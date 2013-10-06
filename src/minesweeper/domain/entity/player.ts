@@ -4,12 +4,14 @@ import Coord = require('./../../../minesweeper-common/domain/valueobject/coord')
 import vp = require('./../../../minesweeper-common/domain/valueobject/viewpoint');
 import ifs = require('./../../../minesweeper-common/infrastructure/valueobject/interfaces');
 import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo');
+import findPath = require('./../service/astar');
 
 var logger = log4js.getLogger();
 
 export = Player;
 class Player extends ee2.EventEmitter2 {
     private events: { event: string; listener: Function }[] = [];
+    private movingTimeoutId = null;
 
     constructor(
         public coord: Coord,
@@ -17,11 +19,11 @@ class Player extends ee2.EventEmitter2 {
          hiyoko, hiyoko_lady, mecha_hiyoko, niwatori, waru_hiyoko, remilia
          */
         public image: string,
-        /** ŽóM—p */
-        private emitter: EventEmitter
-        ) {
+        /** å—ä¿¡ç”¨ */
+        private emitter: EventEmitter) {
+
         super();
-        // ƒCƒxƒ“ƒg‚Ì‰Šú‰»
+        // ã‚¤ãƒ™ãƒ³ãƒˆã®åˆæœŸåŒ–
         this.init();
     }
 
@@ -39,9 +41,9 @@ class Player extends ee2.EventEmitter2 {
             logger.info(coord);
         });
         this.defineEvent('dig', (coord: ifs.ICoordDTO) => {
-            // Œo˜HŒvŽZ‚Æ‚©FX‚·‚é•K—v‚ª‚é
-            this.coord = cdxo.toCoord(coord);
-            super.emit('moved', this.coord);
+            // çµŒè·¯è¨ˆç®—ã¨ã‹è‰²ã€…ã™ã‚‹å¿…è¦ãŒã‚‹
+            var path = findPath(this.coord, cdxo.toCoord(coord), null);
+            this.delayMove(path);
         });
         this.defineEvent('flag', (coord: ifs.ICoordDTO) => {
             logger.info(coord);
@@ -61,4 +63,19 @@ class Player extends ee2.EventEmitter2 {
     private defineEvent(event: string, listener: Function) {
         this.events.push({ event: event, listener: listener });
     }
+
+    private delayMove(path: Coord[]) {
+        if (this.movingTimeoutId != null) {
+            clearTimeout(this.movingTimeoutId);
+        }
+        this.coord = path.shift();
+        super.emit('moved', this.coord);
+        if (path.length <= 0)
+            return;
+        this.movingTimeoutId = setTimeout(() => {
+            this.movingTimeoutId = null;
+            this.delayMove(path);
+        }, 250);
+    }
 }
+
