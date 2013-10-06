@@ -17,14 +17,16 @@ class Client {
         client.on('user_id', userId => {
             this.userId = userId;
 
+            // ユーザーデータをリストア
+            this.restoreOrCreatePlayerId();
+
             var data: ifs.IFullDataDTO = {
                 yourId: this.playerId,
                 activePlayers: dxo.fromActivePlayers(this.mineWorld.activePlayers)
             };
             client.emit('full_data', data);
 
-            // ユーザーデータをリストア
-            this.restoreOrCreatePlayerId(client);
+            this.mineWorld.activatePlayer(this.playerId, client);
 
             client.join(0); // とりあえずroomに入れておく
 
@@ -35,14 +37,13 @@ class Client {
         });
     }
 
-    private restoreOrCreatePlayerId(client: EventEmitter) {
+    private restoreOrCreatePlayerId() {
         var user = usersRepository.get(this.userId);
         if (user == null) {
             this.playerId = this.mineWorld.createPlayer();
             usersRepository.create(this.userId, { playerId: this.playerId });
             user = usersRepository.get(this.userId);
         }
-        this.mineWorld.activatePlayer(user.playerId, client);
         this.playerId = user.playerId;
     }
 

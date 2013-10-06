@@ -27,7 +27,6 @@ class PlayerView {
     }
 
     updatePosition() {
-        console.log(this.model.coord.xString, this.model.coord.yString);
         var pos = this.camera.fromAbsoluteToDisplay(this.model.coord);
         this.displayObject.x = pos.x;
         this.displayObject.y = pos.y - 8;
@@ -44,7 +43,6 @@ class PlayersView {
 
     constructor(private loadQueue: createjs.LoadQueue, private camera: Camera, private activePlayers: ActivePlayers) {
         activePlayers.on('player_moved', (obj: { id: number; coord: Coord }) => {
-            console.log(this.items[obj.id]['model'] === this.activePlayers.get(obj.id))
             this.items[obj.id].updatePosition();
         });
         activePlayers.on('player_added', (obj: { id: number; player: ifs.IPlayer }) => {

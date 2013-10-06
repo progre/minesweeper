@@ -31,7 +31,6 @@ class MineWorld {
         this.deactivatePlayerIfExist(id);
         this.activePlayers[id] = player;
         player.on('moved', (coord: Coord) => {
-            console.log(cdxo.fromCoord(coord));
             this.emitter.emit('moved', { id: id, coord: cdxo.fromCoord(coord) });
         });
         player.on('join_chunk', (coord: Coord) => {
