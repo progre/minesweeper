@@ -51,7 +51,7 @@ class ActivePlayersView {
         activePlayers.on('player_removed', (id: number) => {
             this.displayObject.removeChild(this.items[id].displayObject);
             delete this.items[id];
-            console.log('' + id + 'が削除');
+            console.log('' + id + 'を削除');
             console.log('プレイヤー' + this.activePlayers.count() + '人が参加中');
         });
     }
@@ -60,8 +60,7 @@ class ActivePlayersView {
         var playerView = new PlayerView(this.loadQueue, this.activePlayers.get(id), this.camera);
         this.displayObject.addChild(playerView.displayObject);
         this.items[id] = playerView;
-        console.log('' + id + 'が追加');
-        console.log(this.activePlayers);
+        console.log('' + id + 'を追加');
         console.log('プレイヤー' + this.activePlayers.count() + '人が参加中');
     }
 }
