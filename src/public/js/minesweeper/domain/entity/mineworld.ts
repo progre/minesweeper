@@ -21,6 +21,7 @@ class MineWorld {
 
         emitter.on('full_data', (dto: iv.IFullDataDTO) => {
             var model = cdxo.toMineWorld(dto);
+            console.log('プレイヤー' + Enumerable.from(model.players).count() + '人が参加中');
             this.activePlayers.setPlayers(model.players);
             this.activePlayers.setCentralPlayer(model.yourId);
         });

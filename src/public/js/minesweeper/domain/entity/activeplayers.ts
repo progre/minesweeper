@@ -34,6 +34,9 @@ class ActivePlayers extends ee2.EventEmitter2 {
 
     setPlayers(items: cifs.IHash<cifs.IPlayer>) {
         this.items = items;
+        Object.keys(items).forEach(id => {
+            super.emit('player_added', { id: id, player: items[id] });
+        });
     }
 
     setCentralPlayer(id: number) {
@@ -41,5 +44,9 @@ class ActivePlayers extends ee2.EventEmitter2 {
         if (this.get(id) != null) {
             super.emit('central_player_selected', id);
         }
+    }
+
+    count() {
+        return Enumerable.from(this.items).count();
     }
 }

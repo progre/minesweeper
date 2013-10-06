@@ -33,8 +33,8 @@ class PlayerView {
     }
 }
 
-export = PlayersView;
-class PlayersView {
+export = ActivePlayersView;
+class ActivePlayersView {
     static resourceFiles = PlayerView.resourceFiles;
 
     displayObject = new createjs.Container();
@@ -46,13 +46,22 @@ class PlayersView {
             this.items[obj.id].updatePosition();
         });
         activePlayers.on('player_added', (obj: { id: number; player: ifs.IPlayer }) => {
-            var playerView = new PlayerView(this.loadQueue, this.activePlayers.get(obj.id), this.camera);
-            this.displayObject.addChild(playerView.displayObject);
-            this.items[obj.id] = playerView;
+            this.addPlayer(obj.id);
         });
         activePlayers.on('player_removed', (id: number) => {
             this.displayObject.removeChild(this.items[id].displayObject);
             delete this.items[id];
+            console.log('' + id + 'が削除');
+            console.log('プレイヤー' + this.activePlayers.count() + '人が参加中');
         });
+    }
+
+    private addPlayer(id: number) {
+        var playerView = new PlayerView(this.loadQueue, this.activePlayers.get(id), this.camera);
+        this.displayObject.addChild(playerView.displayObject);
+        this.items[id] = playerView;
+        console.log('' + id + 'が追加');
+        console.log(this.activePlayers);
+        console.log('プレイヤー' + this.activePlayers.count() + '人が参加中');
     }
 }
