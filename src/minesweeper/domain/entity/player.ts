@@ -12,6 +12,7 @@ export = Player;
 class Player extends ee2.EventEmitter2 {
     private events: { event: string; listener: Function }[] = [];
     private movingTimeoutId = null;
+    private path: Coord[];
 
     constructor(
         public coord: Coord,
@@ -42,8 +43,8 @@ class Player extends ee2.EventEmitter2 {
         });
         this.defineEvent('dig', (coord: ifs.ICoordDTO) => {
             // 経路計算とか色々する必要がる
-            var path = findPath(this.coord, cdxo.toCoord(coord), null);
-            this.delayMove(path);
+            this.path = findPath(this.coord, cdxo.toCoord(coord), null);
+            this.delayMove();
         });
         this.defineEvent('flag', (coord: ifs.ICoordDTO) => {
             logger.info(coord);
@@ -64,18 +65,17 @@ class Player extends ee2.EventEmitter2 {
         this.events.push({ event: event, listener: listener });
     }
 
-    private delayMove(path: Coord[]) {
-        if (this.movingTimeoutId != null) {
-            clearTimeout(this.movingTimeoutId);
-        }
-        this.coord = path.shift();
-        super.emit('moved', this.coord);
-        if (path.length <= 0)
+    private delayMove() {
+        if (this.movingTimeoutId != null)
             return;
+        if (this.path.length <= 0)
+            return;
+        this.coord = this.path.shift();
+        super.emit('moved', this.coord);
         this.movingTimeoutId = setTimeout(() => {
             this.movingTimeoutId = null;
-            this.delayMove(path);
-        }, 250);
+            this.delayMove();
+        }, 100);
     }
 }
 
