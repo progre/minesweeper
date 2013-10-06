@@ -12,9 +12,11 @@ class GameScene implements game.Scene {
     private mineWorldView: MineWorldView;
 
     constructor(loadQueue: createjs.LoadQueue) {
-        // �T�[�o�[�ɐڑ�
+        // サーバーに接続
+        console.log('サーバーに接続します...');
         var server = ioserver.connect();
         server.on('connect', () => {
+            console.log('接続しました');
             server.on('disconnect', () => {
                 console.log('disconnect');
             });
