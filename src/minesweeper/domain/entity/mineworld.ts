@@ -28,9 +28,11 @@ class MineWorld {
         var player = playersRepository.get(id, emitter);
         if (player == null)
             throw new Error();
+        this.deactivatePlayerIfExist(id);
         this.activePlayers[id] = player;
-        player.on('digged', (coord: Coord) => {
-            this.emitter.emit('digged', { id: id, coord: cdxo.fromCoord(coord) });
+        player.on('moved', (coord: Coord) => {
+            console.log(cdxo.fromCoord(coord));
+            this.emitter.emit('moved', { id: id, coord: cdxo.fromCoord(coord) });
         });
         player.on('join_chunk', (coord: Coord) => {
             var chunk = this.map.getViewPointChunk(coord);
@@ -38,19 +40,31 @@ class MineWorld {
                 player.putChunk(chunk);
             }
         });
+        logger.info('activate player. id: ' + id);
         this.emitter.emit('player_activated', { id: id, player: dxo.fromPlayer(player) });
     }
 
     deactivatePlayer(id: number) {
         var player = this.activePlayers[id];
         if (player == null) {
-            console.log(id);
-            console.log(this.activePlayers);
-            throw new Error('めったにおきないけどおきる');
+            logger.warn('player is not exist. id: ' + id);
+            return;
         }
+        this.deactivate(id, player);
+    }
+
+    private deactivatePlayerIfExist(id: number) {
+        var player = this.activePlayers[id];
+        if (player == null)
+            return;
+        this.deactivate(id, player);
+    }
+
+    private deactivate(id: number, player: Player) {
         playersRepository.put(id, player);
         player.dispose();
         delete this.activePlayers[id];
+        logger.info('deactivate player. id: ' + id);
         this.emitter.emit('player_deactivated', { id: id, player: dxo.fromPlayer(player) });
     }
 }

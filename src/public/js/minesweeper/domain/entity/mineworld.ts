@@ -39,7 +39,6 @@ class MineWorld {
     }
 
     dig(coord: Coord) {
-        console.log(cdxo.fromCoord(coord)); // スリープ復帰とかに吹っ切れる
         this.emitter.emit('dig', cdxo.fromCoord(coord));
     }
 

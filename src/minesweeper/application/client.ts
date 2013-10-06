@@ -17,6 +17,12 @@ class Client {
         client.on('user_id', userId => {
             this.userId = userId;
 
+            var data: ifs.IFullDataDTO = {
+                yourId: this.playerId,
+                activePlayers: dxo.fromActivePlayers(this.mineWorld.activePlayers)
+            };
+            client.emit('full_data', data);
+
             // ユーザーデータをリストア
             this.restoreOrCreatePlayerId(client);
 
@@ -26,12 +32,6 @@ class Client {
                 logger.log('disconnect: ' + client.id);
                 this.store();
             });
-
-            var data: ifs.IFullDataDTO = {
-                yourId: this.playerId,
-                activePlayers: dxo.fromActivePlayers(this.mineWorld.activePlayers)
-            };
-            client.emit('full_data', data);
         });
     }
 

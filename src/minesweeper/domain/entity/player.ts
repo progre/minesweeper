@@ -39,10 +39,9 @@ class Player extends ee2.EventEmitter2 {
             logger.info(coord);
         });
         this.defineEvent('dig', (coord: ifs.ICoordDTO) => {
-            console.log(coord.x, coord.y)
             // 経路計算とか色々する必要がる
             this.coord = cdxo.toCoord(coord);
-            super.emit('digged', coord);
+            super.emit('moved', this.coord);
         });
         this.defineEvent('flag', (coord: ifs.ICoordDTO) => {
             logger.info(coord);

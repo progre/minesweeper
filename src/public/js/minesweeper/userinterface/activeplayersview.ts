@@ -43,11 +43,12 @@ class PlayersView {
     private center: Coord;
 
     constructor(private loadQueue: createjs.LoadQueue, private camera: Camera, private activePlayers: ActivePlayers) {
-        activePlayers.on('player_moved', (id: number) => {
-            this.items[id].updatePosition();
+        activePlayers.on('player_moved', (obj: { id: number; coord: Coord }) => {
+            console.log(this.items[obj.id]['model'] === this.activePlayers.get(obj.id))
+            this.items[obj.id].updatePosition();
         });
         activePlayers.on('player_added', (obj: { id: number; player: ifs.IPlayer }) => {
-            var playerView = new PlayerView(this.loadQueue, obj.player, this.camera);
+            var playerView = new PlayerView(this.loadQueue, this.activePlayers.get(obj.id), this.camera);
             this.displayObject.addChild(playerView.displayObject);
             this.items[obj.id] = playerView;
         });
