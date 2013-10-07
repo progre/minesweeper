@@ -18,7 +18,7 @@ class MineWorldView {
     private camera = new Camera(Coord.of('0', '0'));
 
     constructor(private loadQueue: createjs.LoadQueue, private mineWorld: MineWorld) {
-        this.landformView = new LandformView(loadQueue, mineWorld.landform);
+        this.landformView = new LandformView(loadQueue, mineWorld.landform, this.camera);
         this.activePlayersView = new ActivePlayersView(loadQueue, this.camera, mineWorld.activePlayers);
 
         this.mineWorld.activePlayers.on('central_player_selected', (id: number) => {

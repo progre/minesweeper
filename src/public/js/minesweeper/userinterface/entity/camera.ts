@@ -34,6 +34,12 @@ class Camera extends ee2.EventEmitter2 {
             y: Math.round(y / 32)
         };
     }
+
+    /** 表示座標→実座標 */
+    fromRelativeToAbsolute(x: number, y: number) {
+        return Coord.fromNumber(x, y).add(this.center);
+    }
+
     /** 表示描画座標(中心が0)→実座標 */
     fromDisplayToAbsolute(x: number, y: number) {
         var pos = this.fromDisplayToRelative(x, y);

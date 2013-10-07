@@ -57,8 +57,8 @@ class Player extends ee2.EventEmitter2 {
         this.events.forEach(x => this.emitter.removeListener(x.event, x.listener));
     }
 
-    putChunk(chunk: vp.ViewPoint[][]) {
-        this.emitter.emit('chunk', chunk);
+    putChunk(coord: Coord, chunk: vp.ViewPoint[][]) {
+        this.emitter.emit('chunk', { coord: cdxo.fromCoord(coord), chunk: chunk });
     }
 
     private defineEvent(event: string, listener: Function) {

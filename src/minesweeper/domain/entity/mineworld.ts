@@ -4,14 +4,14 @@ import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo'
 import playersRepository = require('./../../infrastructure/playersrepository');
 import dxo = require('./../../infrastructure/dxo');
 import Player = require('./player');
-import ServerMap = require('./servermap');
+import Landform = require('./landform');
 
 var logger = log4js.getLogger();
 
 export = MineWorld;
 class MineWorld {
     activePlayers: { [key: number]: Player } = {};
-    map = new ServerMap();
+    map = new Landform();
 
     constructor(
         /** プレイヤー全体に通知するemitter */
@@ -34,10 +34,10 @@ class MineWorld {
             this.emitter.emit('moved', { id: id, coord: cdxo.fromCoord(coord) });
         });
         player.on('join_chunk', (coord: Coord) => {
-            var chunk = this.map.getViewPointChunk(coord);
-            if (chunk != null) {
-                player.putChunk(chunk);
-            }
+            this.map.join(coord, player);
+        });
+        player.on('defect_chunk', (coord: Coord) => {
+            this.map.defect(coord, player);
         });
         logger.info('activate player. id: ' + id);
         this.emitter.emit('player_activated', { id: id, player: dxo.fromPlayer(player) });
@@ -60,6 +60,7 @@ class MineWorld {
     }
 
     private deactivate(id: number, player: Player) {
+        this.map.defectAll(player);
         playersRepository.put(id, player);
         player.dispose();
         delete this.activePlayers[id];

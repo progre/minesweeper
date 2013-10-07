@@ -1,5 +1,4 @@
 import ee2 = require('eventemitter2');
-import ViewPoint = require('./../../../minesweeper-common/domain/valueobject/viewpoint');
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
 import iv = require('./../../../minesweeper-common/infrastructure/valueobject/interfaces');
 import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo');
@@ -24,14 +23,6 @@ class MineWorld {
             console.log('プレイヤー' + Enumerable.from(model.players).count() + '人が参加中');
             this.activePlayers.setPlayers(model.players);
             this.activePlayers.setCentralPlayer(model.yourId);
-        });
-        emitter.on('chunk', (obj: ViewPoint[][]) => {
-        });
-        emitter.on('opened', () => {
-        });
-        emitter.on('flagged', () => {
-        });
-        emitter.on('bombed', () => {
         });
     }
 
