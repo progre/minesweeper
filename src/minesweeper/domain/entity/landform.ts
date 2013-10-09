@@ -1,5 +1,6 @@
 var log4js = require('log4js');
 import MapBase = require('./../../../minesweeper-common/domain/entity/mapbase');
+import ChunkNotFoundError = require('./../../../minesweeper-common/domain/entity/chunknotfounderror');
 import vp = require('./../../../minesweeper-common/domain/valueobject/viewpoint');
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
 import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo');
@@ -15,7 +16,10 @@ class Landform extends MapBase {
     join(coord: Coord, player: Player) {
         logger.debug('player join to: ' + coord.toString());
         this.players.put(coord, player);
-        player.putChunk(coord, this.getViewPointChunk(coord));
+        var chunk = this.getViewPointChunk(coord);
+        if (chunk == null)
+            return;
+        player.putChunk(coord, chunk);
     }
 
     defect(coord: Coord, player: Player) {
@@ -40,6 +44,16 @@ class Landform extends MapBase {
             this.viewPointChunks.putByCoord(coord, chunk);
             super.emit('chunk', { coord: coord, chunk: chunk });
         });
+    }
+
+    getViewPointChunk(coord: Coord) {
+        try {
+            return super.getViewPointChunk(coord);
+        } catch (error) {
+            if (error.name !== ChunkNotFoundError.name)
+                throw error;
+            return null;
+        }
     }
 }
 

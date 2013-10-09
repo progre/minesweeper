@@ -1,5 +1,6 @@
 import game = require('./../../framework/game');
 import vp = require('./../../minesweeper-common/domain/valueobject/viewpoint');
+import Coord = require('./../../minesweeper-common/domain/valueobject/coord');
 import Landform = require('./../domain/entity/landform');
 import Camera = require('./entity/camera');
 
@@ -7,15 +8,21 @@ export = LandformView;
 class LandformView {
     static resourceFiles = ['/img/block.png'];
 
+    private rect: game.Rect;
+
     backDisplayObject = new createjs.Container();
     private templateBlock: createjs.BitmapAnimation;
 
     constructor(private loadQueue: createjs.LoadQueue, private landform: Landform, private camera: Camera) {
         this.templateBlock = this.createTemplate(loadQueue);
         this.templateBlock.gotoAndPlay('unknown');
+        landform.on('chunk_updated', (coord: Coord) => {
+            //this.setSize(this.rect);
+        });
     }
 
     setSize(value: game.Rect) {
+        this.rect = value;
         this.backDisplayObject.removeAllChildren();
         this.backDisplayObject.uncache();
 
