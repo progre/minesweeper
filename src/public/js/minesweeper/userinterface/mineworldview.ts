@@ -23,6 +23,11 @@ class MineWorldView {
 
         this.mineWorld.activePlayers.on('central_player_selected', (id: number) => {
             this.camera.setCenter(mineWorld.activePlayers.get(id).coord);
+            mineWorld.activePlayers.on('player_moved', (obj: { id: number; coord: Coord }) => {
+                if (obj.id !== id)
+                    return;
+                this.camera.setCenter(obj.coord);
+            });
         });
 
         this.clickObject.addEventListener('click', (eventObj: any) => {
