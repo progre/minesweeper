@@ -39,6 +39,18 @@ class Landform extends MapBase {
         (callback => callback(null))((chunk: vp.ViewPoint[][]) => {
             if (chunk == null) {
                 chunk = createViewPointChunk();
+                if (coord.equals(Coord.fromNumber(-1, -1))) {
+                    setEmpty(chunk, 8, 16, 8, 16);
+                }
+                if (coord.equals(Coord.fromNumber(0, -1))) {
+                    setEmpty(chunk, 0, 8, 8, 16);
+                }
+                if (coord.equals(Coord.fromNumber(-1, 0))) {
+                    setEmpty(chunk, 8, 16, 0, 8);
+                }
+                if (coord.equals(Coord.fromNumber(0, 0))) {
+                    setEmpty(chunk, 0, 8, 0, 8);
+                }
                 // DBÇ…èëÇ´çûÇﬁÅH
             }
             this.viewPointChunks.putByCoord(coord, chunk);
@@ -70,6 +82,14 @@ function createViewPointChunk(): vp.ViewPoint[][] {
         chunk.push(line);
     }
     return chunk;
+}
+
+function setEmpty(chunk: vp.ViewPoint[][], xBegin: number, xEnd: number, yBegin: number, yEnd: number) {
+    for (var y = yBegin; y < yEnd; y++) {
+        for (var x = xBegin; x < xEnd; x++) {
+            chunk[y][x].status = vp.Status.OPEN;
+        }
+    }
 }
 
 class CoordMultiMap extends MultiMap<Coord, Player> {
