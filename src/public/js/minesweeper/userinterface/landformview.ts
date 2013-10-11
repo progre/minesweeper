@@ -18,7 +18,7 @@ class LandformView {
         this.templateBlock = this.createTemplate(loadQueue);
         this.templateBlock.gotoAndPlay('unknown');
         landform.on('chunk_updated', (coord: Coord) => {
-            this.refreshBlocks();
+            this.updateBlocks();
         });
     }
 
@@ -29,7 +29,6 @@ class LandformView {
 
     refreshBlocks() {
         this.backDisplayObject.removeAllChildren();
-        this.backDisplayObject.uncache();
 
         // ƒuƒƒbƒNˆê‚Â‚Í32px
         var colCount = this.rect.width / 32 | 0;
@@ -53,9 +52,6 @@ class LandformView {
             this.blocks.push(line);
         }
         this.updateBlocks();
-        var left = -(colCount >> 1) * 32 - 16;
-        var top = -(rowCount >> 1) * 32 - 16;
-        this.backDisplayObject.cache(left, top, colCount * 32, rowCount * 32);
     }
 
     private updateBlocks() {
@@ -85,6 +81,8 @@ class LandformView {
                 }
             }
         }
+        console.log('block updated.');
+        this.backDisplayObject.cache(left, top, cols * 32, rows * 32);
     }
 
     private createTemplate(loadQueue: createjs.LoadQueue) {
