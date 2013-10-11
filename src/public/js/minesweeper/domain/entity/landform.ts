@@ -37,6 +37,7 @@ class Landform extends MapBase {
             return;
         this.joinRequests[coord.toString()] = new Date();
         this.emitter.emit('join_chunk', cdxo.fromCoord(coord));
+        console.log('Chunk' + coord.toString() + 'を要求しました');
     }
 }
 

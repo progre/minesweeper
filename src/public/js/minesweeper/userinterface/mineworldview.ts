@@ -27,6 +27,7 @@ class MineWorldView {
                 if (obj.id !== id)
                     return;
                 this.camera.setCenter(obj.coord);
+                this.landformView.refreshBlocks();
             });
         });
 

@@ -8,44 +8,71 @@ export = LandformView;
 class LandformView {
     static resourceFiles = ['/img/block.png'];
 
-    private rect: game.Rect;
-
     backDisplayObject = new createjs.Container();
     private templateBlock: createjs.BitmapAnimation;
+    private blocks: createjs.BitmapAnimation[][] = [[]];
+    /** Œ»Ý‚Ì•`‰æ—Ìˆæ */
+    private rect: game.Rect;
 
     constructor(private loadQueue: createjs.LoadQueue, private landform: Landform, private camera: Camera) {
         this.templateBlock = this.createTemplate(loadQueue);
         this.templateBlock.gotoAndPlay('unknown');
         landform.on('chunk_updated', (coord: Coord) => {
-            //this.setSize(this.rect);
+            this.refreshBlocks();
         });
     }
 
     setSize(value: game.Rect) {
         this.rect = value;
+        this.refreshBlocks();
+    }
+
+    refreshBlocks() {
         this.backDisplayObject.removeAllChildren();
         this.backDisplayObject.uncache();
 
         // ƒuƒƒbƒNˆê‚Â‚Í32px
-        var colCount = value.width / 32 | 0;
+        var colCount = this.rect.width / 32 | 0;
         if (colCount % 2 === 0) {
             colCount++;
         }
         colCount += 2;
-        var rowCount = value.height / 32 | 0;
+        var rowCount = this.rect.height / 32 | 0;
         if (rowCount % 2 === 0) {
             rowCount++;
         }
         rowCount += 2;
-        var left = -(colCount >> 1) * 32 - 16;
-        var top = -(rowCount >> 1) * 32 - 16;
+        this.blocks = [];
         for (var row = 0; row < rowCount; row++) {
+            var line: createjs.BitmapAnimation[] = [];
             for (var col = 0; col < colCount; col++) {
                 var block = this.templateBlock.clone();
+                line.push(block);
+                this.backDisplayObject.addChild(block);
+            }
+            this.blocks.push(line);
+        }
+        this.updateBlocks();
+        var left = -(colCount >> 1) * 32 - 16;
+        var top = -(rowCount >> 1) * 32 - 16;
+        this.backDisplayObject.cache(left, top, colCount * 32, rowCount * 32);
+    }
+
+    private updateBlocks() {
+        if (this.blocks == null || this.blocks.length <= 0)
+            return;
+        var rows = this.blocks.length;
+        var rowCenter = rows >> 1;
+        var cols = this.blocks[0].length;
+        var colCenter = cols >> 1;
+        var top = -(rows >> 1) * 32 - 16;
+        var left = -(cols >> 1) * 32 - 16;
+        for (var row = 0; row < rows; row++) {
+            for (var col = 0; col < cols; col++) {
+                var block = this.blocks[row][col];
                 block.x = left + col * 32;
                 block.y = top + row * 32;
-                this.backDisplayObject.addChild(block);
-                switch (this.landform.getViewPoint(this.camera.fromRelativeToAbsolute(col, row)).status) {
+                switch (this.landform.getViewPoint(this.camera.fromRelativeToAbsolute(col - colCenter, row - rowCenter)).status) {
                     case vp.Status.UNKNOWN:
                         block.gotoAndPlay('unknown');
                         break;
@@ -58,7 +85,6 @@ class LandformView {
                 }
             }
         }
-        this.backDisplayObject.cache(left, top, colCount * 32, rowCount * 32);
     }
 
     private createTemplate(loadQueue: createjs.LoadQueue) {

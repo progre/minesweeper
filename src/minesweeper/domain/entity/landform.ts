@@ -40,21 +40,23 @@ class Landform extends MapBase {
             if (chunk == null) {
                 chunk = createViewPointChunk();
                 if (coord.equals(Coord.fromNumber(-1, -1))) {
-                    setEmpty(chunk, 8, 16, 8, 16);
+                    setEmpty(chunk, 9, 9, 16, 16);
                 }
                 if (coord.equals(Coord.fromNumber(0, -1))) {
-                    setEmpty(chunk, 0, 8, 8, 16);
+                    setEmpty(chunk, 0, 9, 8, 16);
                 }
                 if (coord.equals(Coord.fromNumber(-1, 0))) {
-                    setEmpty(chunk, 8, 16, 0, 8);
+                    setEmpty(chunk, 9, 0, 16, 8);
                 }
                 if (coord.equals(Coord.fromNumber(0, 0))) {
-                    setEmpty(chunk, 0, 8, 0, 8);
+                    setEmpty(chunk, 0, 0, 8, 8);
                 }
                 // DB‚É‘‚«ž‚ÞH
             }
             this.viewPointChunks.putByCoord(coord, chunk);
-            super.emit('chunk', { coord: coord, chunk: chunk });
+            this.players.get(coord).forEach(player => {
+                player.putChunk(coord, chunk);
+            });
         });
     }
 
@@ -84,7 +86,7 @@ function createViewPointChunk(): vp.ViewPoint[][] {
     return chunk;
 }
 
-function setEmpty(chunk: vp.ViewPoint[][], xBegin: number, xEnd: number, yBegin: number, yEnd: number) {
+function setEmpty(chunk: vp.ViewPoint[][], xBegin: number, yBegin: number, xEnd: number, yEnd: number) {
     for (var y = yBegin; y < yEnd; y++) {
         for (var x = xBegin; x < xEnd; x++) {
             chunk[y][x].status = vp.Status.OPEN;
