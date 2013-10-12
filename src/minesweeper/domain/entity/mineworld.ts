@@ -11,7 +11,7 @@ var logger = log4js.getLogger();
 export = MineWorld;
 class MineWorld {
     activePlayers: { [key: number]: Player } = {};
-    map = new Landform();
+    private landform = new Landform();
 
     constructor(
         /** プレイヤー全体に通知するemitter */
@@ -30,15 +30,15 @@ class MineWorld {
             throw new Error();
         this.deactivatePlayerIfExist(id);
         this.activePlayers[id] = player;
-        player.setField(this.map);
+        player.setField(this.landform);
         player.on('moved', (coord: Coord) => {
             this.emitter.emit('moved', { id: id, coord: cdxo.fromCoord(coord) });
         });
         player.on('join_chunk', (coord: Coord) => {
-            this.map.join(coord, player);
+            this.landform.join(coord, player);
         });
         player.on('defect_chunk', (coord: Coord) => {
-            this.map.defect(coord, player);
+            this.landform.defect(coord, player);
         });
         logger.info('activate player. id: ' + id);
         this.emitter.emit('player_activated', { id: id, player: dxo.fromPlayer(player) });
@@ -61,7 +61,7 @@ class MineWorld {
     }
 
     private deactivate(id: number, player: Player) {
-        this.map.defectAll(player);
+        this.landform.defectAll(player);
         playersRepository.put(id, player);
         player.dispose();
         delete this.activePlayers[id];

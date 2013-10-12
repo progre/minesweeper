@@ -75,6 +75,37 @@ class Landform extends MapBase {
             return null;
         }
     }
+
+    move(player: Player, to: Coord) {
+        if (!this.isMovable(to))
+            return false;
+        player.coord = to;
+        return true;
+    }
+
+    isMovable(coord: Coord) {
+        return isMovable(this.getViewPoint(coord));
+    }
+
+    dig(coord: Coord) {
+        var viewPoint = super.getViewPoint(coord);
+        viewPoint.status = vp.Status.OPEN;
+        this.players.get(globalToChunk(coord)).forEach(player => {
+            player.putViewPoint(coord, viewPoint);
+        });
+    }
+
+    flag(coord: Coord) {
+    }
+}
+
+function globalToChunk(coord: Coord): Coord {
+    return new Coord(coord.x.shiftRight(4), coord.y.shiftRight(4));
+}
+
+function isMovable(viewPoint: vp.ViewPoint) {
+    return viewPoint.status === vp.Status.OPEN
+        && viewPoint.landform === vp.Landform.NONE;
 }
 
 /** 16x16‚Ì’nŒ`‚ğì¬‚·‚é */
@@ -108,4 +139,4 @@ class CoordMultiMap extends MultiMap<Coord, Player> {
     }
 }
 
-var __scope: MultiMap<any, any> = new MultiMap<any,any>();// MultiMap‚Ìimport‚ªÁ‚¦‚é‚½‚ß‚â‚Ş‚È‚­
+var __scope: MultiMap<any, any> = new MultiMap<any, any>();// MultiMap‚Ìimport‚ªÁ‚¦‚é‚½‚ß‚â‚Ş‚È‚­

@@ -19,6 +19,10 @@ class Landform extends MapBase {
             delete this.joinRequests[obj.coord.toString()];
             this.putViewPointChunk(cdxo.toCoord(obj.coord), obj.chunk);
         });
+        emitter.on('view_point', (obj: { coord: ifs.ICoordDTO; viewPoint: vp.ViewPoint }) => {
+            console.log('viewPoint' + cdxo.toCoord(obj.coord).toString() + 'を受信しました');
+            this.putViewPoint(cdxo.toCoord(obj.coord), obj.viewPoint);
+        });
         emitter.on('opened', () => {
         });
         emitter.on('flagged', () => {

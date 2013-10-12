@@ -44,13 +44,7 @@ class Player extends ee2.EventEmitter2 {
             logger.info(coord);
         });
         this.defineEvent('dig', (coord: ifs.ICoordDTO) => {
-            if (this.field == null)
-                return;
-            var to = cdxo.toCoord(coord);
-            if (isNaN(this.coord.distance(to))) // 余りにも遠いのは不可
-                return;
-            this.path = this.field.pathFinder.find(this.coord, to);
-            this.delayMove();
+            this.beginMove(Intent.DIGGING, cdxo.toCoord(coord));
         });
         this.defineEvent('flag', (coord: ifs.ICoordDTO) => {
             logger.info(coord);
@@ -75,16 +69,45 @@ class Player extends ee2.EventEmitter2 {
         this.emitter.emit('chunk', { coord: cdxo.fromCoord(coord), chunk: chunk });
     }
 
-    private delayMove() {
-        if (this.movingTimeoutId != null)
+    putViewPoint(coord: Coord, viewPoint: vp.ViewPoint) {
+        this.emitter.emit('view_point', { coord: cdxo.fromCoord(coord), viewPoint: viewPoint});
+    }
+
+    private beginMove(intent: Intent, to: Coord) {
+        if (this.field == null)
+            return;
+        if (isNaN(this.coord.distance(to))) // 余りにも遠いのは不可
+            return;
+        this.path = this.field.pathFinder.find(this.coord, to);
+        this.delayMove(intent);
+    }
+
+    private delayMove(intent: Intent) {
+        if (this.movingTimeoutId != null) // タイムアウトが仕込まれている場合は中断
             return;
         if (this.path.length <= 0)
             return;
-        this.coord = this.path.shift();
+        var coord = this.path.shift();
+        if (!this.field.move(this, coord)) {
+            if (intent === Intent.MOVING
+                || this.path.length > 0) {
+                this.path = [];
+                return;
+            }
+            switch (intent) {
+                case Intent.FLAG: this.field.flag(coord); return;
+                case Intent.DIGGING: this.field.dig(coord); break;// 続行
+            }
+            this.path.push(coord);
+        }
         super.emit('moved', this.coord);
         this.movingTimeoutId = setTimeout(() => {
             this.movingTimeoutId = null;
-            this.delayMove();
+            this.delayMove(intent);
         }, 100);
     }
+}
+
+enum Intent {
+    MOVING, DIGGING, FLAG
 }

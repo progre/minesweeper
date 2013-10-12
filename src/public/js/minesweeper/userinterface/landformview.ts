@@ -20,6 +20,9 @@ class LandformView {
         landform.on('chunk_updated', (coord: Coord) => {
             this.updateBlocks();
         });
+        landform.on('view_point_updated', (coord: Coord) => {
+            this.updateBlocks();
+        });
     }
 
     setSize(value: game.Rect) {

@@ -22,7 +22,7 @@ class PathFinder {
             lowNode.getAroundCoords().forEach((around: Coord) => {
                 if (openList.contains(around) || contains(closeList, around))
                     return;// continue
-                if (!isMovable(this.field.getViewPoint(around)))
+                if (!around.equals(to) && !this.field.isMovable(around))
                     return;// continue
                 var distance = around.distance(to);
                 if (isNaN(distance))
@@ -36,11 +36,6 @@ class PathFinder {
         }
         return [];
     }
-}
-
-function isMovable(viewPoint: vp.ViewPoint) {
-    return viewPoint.status === vp.Status.OPEN
-        && viewPoint.landform === vp.Landform.NONE;
 }
 
 function createPath(closeList: Node[], lastNode: Node) {
