@@ -4,7 +4,6 @@ import Coord = require('./../../../minesweeper-common/domain/valueobject/coord')
 import vp = require('./../../../minesweeper-common/domain/valueobject/viewpoint');
 import ifs = require('./../../../minesweeper-common/infrastructure/valueobject/interfaces');
 import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo');
-import findPath = require('./../service/astar');
 
 var logger = log4js.getLogger();
 
@@ -42,9 +41,7 @@ class Player extends ee2.EventEmitter2 {
             logger.info(coord);
         });
         this.defineEvent('dig', (coord: ifs.ICoordDTO) => {
-            // 経路計算とか色々する必要がる
-            this.path = findPath(this.coord, cdxo.toCoord(coord), null);
-            this.delayMove();
+            super.emit('moving', cdxo.toCoord(coord));
         });
         this.defineEvent('flag', (coord: ifs.ICoordDTO) => {
             logger.info(coord);
@@ -59,6 +56,11 @@ class Player extends ee2.EventEmitter2 {
 
     putChunk(coord: Coord, chunk: vp.ViewPoint[][]) {
         this.emitter.emit('chunk', { coord: cdxo.fromCoord(coord), chunk: chunk });
+    }
+
+    move(path: Coord[]) {
+        this.path = path;
+        this.delayMove();
     }
 
     private defineEvent(event: string, listener: Function) {

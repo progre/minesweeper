@@ -3,7 +3,6 @@ import MapBase = require('./../../../minesweeper-common/domain/entity/mapbase');
 import ChunkNotFoundError = require('./../../../minesweeper-common/domain/entity/chunknotfounderror');
 import vp = require('./../../../minesweeper-common/domain/valueobject/viewpoint');
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
-import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo');
 import MultiMap = require('./multimap');
 import Player = require('./player');
 
@@ -40,16 +39,16 @@ class Landform extends MapBase {
             if (chunk == null) {
                 chunk = createViewPointChunk();
                 if (coord.equals(Coord.fromNumber(-1, -1))) {
-                    setEmpty(chunk, 9, 9, 16, 16);
+                    setEmpty(chunk, 13, 13, 16, 16);
                 }
                 if (coord.equals(Coord.fromNumber(0, -1))) {
-                    setEmpty(chunk, 0, 9, 8, 16);
+                    setEmpty(chunk, 0, 13, 4, 16);
                 }
                 if (coord.equals(Coord.fromNumber(-1, 0))) {
-                    setEmpty(chunk, 9, 0, 16, 8);
+                    setEmpty(chunk, 13, 0, 16, 4);
                 }
                 if (coord.equals(Coord.fromNumber(0, 0))) {
-                    setEmpty(chunk, 0, 0, 8, 8);
+                    setEmpty(chunk, 0, 0, 4, 4);
                 }
                 // DBÇ…èëÇ´çûÇﬁÅH
             }
@@ -90,6 +89,7 @@ function setEmpty(chunk: vp.ViewPoint[][], xBegin: number, yBegin: number, xEnd:
     for (var y = yBegin; y < yEnd; y++) {
         for (var x = xBegin; x < xEnd; x++) {
             chunk[y][x].status = vp.Status.OPEN;
+            chunk[y][x].landform = vp.Landform.NONE;
         }
     }
 }
@@ -100,3 +100,5 @@ class CoordMultiMap extends MultiMap<Coord, Player> {
         return key.toString();
     }
 }
+
+var __scope: MultiMap<any, any> = new MultiMap<any,any>();// MultiMapÇÃimportÇ™è¡Ç¶ÇÈÇΩÇﬂÇ‚ÇﬁÇ»Ç≠
