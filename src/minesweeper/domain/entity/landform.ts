@@ -5,12 +5,19 @@ import vp = require('./../../../minesweeper-common/domain/valueobject/viewpoint'
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
 import MultiMap = require('./multimap');
 import Player = require('./player');
+import PathFinder = require('./pathfinder');
 
 var logger = log4js.getLogger();
 
 export = Landform;
 class Landform extends MapBase {
+    pathFinder: PathFinder;
     private players = new CoordMultiMap();
+
+    constructor() {
+        super();
+        this.pathFinder = new PathFinder(this);
+    }
 
     join(coord: Coord, player: Player) {
         logger.debug('player join to: ' + coord.toString());

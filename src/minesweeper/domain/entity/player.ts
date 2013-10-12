@@ -4,6 +4,7 @@ import Coord = require('./../../../minesweeper-common/domain/valueobject/coord')
 import vp = require('./../../../minesweeper-common/domain/valueobject/viewpoint');
 import ifs = require('./../../../minesweeper-common/infrastructure/valueobject/interfaces');
 import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo');
+import Landform = require('./landform');
 
 var logger = log4js.getLogger();
 
@@ -12,6 +13,8 @@ class Player extends ee2.EventEmitter2 {
     private events: { event: string; listener: Function }[] = [];
     private movingTimeoutId = null;
     private path: Coord[];
+    /** 視界 */
+    private field: Landform;
 
     constructor(
         public coord: Coord,
@@ -41,7 +44,13 @@ class Player extends ee2.EventEmitter2 {
             logger.info(coord);
         });
         this.defineEvent('dig', (coord: ifs.ICoordDTO) => {
-            super.emit('moving', cdxo.toCoord(coord));
+            if (this.field == null)
+                return;
+            var to = cdxo.toCoord(coord);
+            if (isNaN(this.coord.distance(to))) // 余りにも遠いのは不可
+                return;
+            this.path = this.field.pathFinder.find(this.coord, to);
+            this.delayMove();
         });
         this.defineEvent('flag', (coord: ifs.ICoordDTO) => {
             logger.info(coord);
@@ -54,17 +63,16 @@ class Player extends ee2.EventEmitter2 {
         this.events.forEach(x => this.emitter.removeListener(x.event, x.listener));
     }
 
-    putChunk(coord: Coord, chunk: vp.ViewPoint[][]) {
-        this.emitter.emit('chunk', { coord: cdxo.fromCoord(coord), chunk: chunk });
-    }
-
-    move(path: Coord[]) {
-        this.path = path;
-        this.delayMove();
-    }
-
     private defineEvent(event: string, listener: Function) {
         this.events.push({ event: event, listener: listener });
+    }
+
+    setField(field: Landform) {
+        this.field = field;
+    }
+
+    putChunk(coord: Coord, chunk: vp.ViewPoint[][]) {
+        this.emitter.emit('chunk', { coord: cdxo.fromCoord(coord), chunk: chunk });
     }
 
     private delayMove() {
@@ -80,4 +88,3 @@ class Player extends ee2.EventEmitter2 {
         }, 100);
     }
 }
-

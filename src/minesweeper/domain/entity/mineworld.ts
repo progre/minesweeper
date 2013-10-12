@@ -3,7 +3,6 @@ import Coord = require('./../../../minesweeper-common/domain/valueobject/coord')
 import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo');
 import playersRepository = require('./../../infrastructure/playersrepository');
 import dxo = require('./../../infrastructure/dxo');
-import findPath = require('./../service/astar');
 import Player = require('./player');
 import Landform = require('./landform');
 
@@ -31,11 +30,7 @@ class MineWorld {
             throw new Error();
         this.deactivatePlayerIfExist(id);
         this.activePlayers[id] = player;
-        player.on('moving', (coord: Coord) => {
-            if (isNaN(player.coord.distance(coord)))
-                return;
-            player.move(findPath(this.map, player.coord, coord));
-        });
+        player.setField(this.map);
         player.on('moved', (coord: Coord) => {
             this.emitter.emit('moved', { id: id, coord: cdxo.fromCoord(coord) });
         });

@@ -4,32 +4,38 @@ import Coord = require('./../../../minesweeper-common/domain/valueobject/coord')
 import vp = require('./../../../minesweeper-common/domain/valueobject/viewpoint');
 import Landform = require('./../entity/landform');
 
-export = findPath;
-function findPath(landform: Landform, from: Coord, to: Coord): Coord[] {
-    var openList = new OpenList(new Node(from, null, 0, 0));
-    var closeList: Node[] = [];
-    while (!openList.empty()) {
-        var lowNode = openList.pop(); // コストの一番安いノード
-        if (lowNode.coord.equals(to)) {
-            return createPath(closeList, lowNode);// 経路完成
-        }
-        closeList.push(lowNode);
-        lowNode.getAroundCoords().forEach((around: Coord) => {
-            if (openList.contains(around) || contains(closeList, around))
-                return;// continue
-            if (!isMovable(landform.getViewPoint(around)))
-                return;// continue
-            var distance = around.distance(to);
-            if (isNaN(distance))
-                return;// continue
-            openList.push(new Node(
-                around,
-                lowNode.coord,
-                lowNode.cost + 1,
-                distance));
-        });
+export = PathFinder;
+class PathFinder {
+    constructor(
+        private field: Landform) {
     }
-    return [];
+
+    find(from: Coord, to: Coord): Coord[] {
+        var openList = new OpenList(new Node(from, null, 0, 0));
+        var closeList: Node[] = [];
+        while (!openList.empty()) {
+            var lowNode = openList.pop(); // コストの一番安いノード
+            if (lowNode.coord.equals(to)) {
+                return createPath(closeList, lowNode);// 経路完成
+            }
+            closeList.push(lowNode);
+            lowNode.getAroundCoords().forEach((around: Coord) => {
+                if (openList.contains(around) || contains(closeList, around))
+                    return;// continue
+                if (!isMovable(this.field.getViewPoint(around)))
+                    return;// continue
+                var distance = around.distance(to);
+                if (isNaN(distance))
+                    return;// continue
+                openList.push(new Node(
+                    around,
+                    lowNode.coord,
+                    lowNode.cost + 1,
+                    distance));
+            });
+        }
+        return [];
+    }
 }
 
 function isMovable(viewPoint: vp.ViewPoint) {
