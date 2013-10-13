@@ -1,7 +1,7 @@
 import BigInteger = require('jsbn');
 import Enumerable = require('../../../lib/linq');
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
-import vp = require('./../../../minesweeper-common/domain/valueobject/viewpoint');
+import enums = require('./../../../minesweeper-common/domain/valueobject/enums');
 import Landform = require('./../entity/landform');
 
 export = PathFinder;

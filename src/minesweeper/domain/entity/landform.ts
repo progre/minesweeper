@@ -1,9 +1,11 @@
 var log4js = require('log4js');
 import Enumerable = require('./../../../lib/linq');
-import MapBase = require('./../../../minesweeper-common/domain/entity/mapbase');
-import Chunk = require('./../../../minesweeper-common/domain/entity/chunk');
+import LandformBase = require('./../../../minesweeper-common/domain/entity/landformbase');
 import ChunkNotFoundError = require('./../../../minesweeper-common/domain/entity/chunknotfounderror');
-import vp = require('./../../../minesweeper-common/domain/valueobject/viewpoint');
+import Chunk = require('./../../../minesweeper-common/domain/entity/chunk');
+import enums = require('./../../../minesweeper-common/domain/valueobject/enums');
+import Tile = require('./../../../minesweeper-common/domain/valueobject/tile');
+import ClientTile = require('./../../../minesweeper-common/domain/valueobject/clienttile');
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
 import MultiMap = require('./multimap');
 import Player = require('./player');
@@ -12,13 +14,21 @@ import PathFinder = require('./pathfinder');
 var logger = log4js.getLogger();
 
 export = Landform;
-class Landform extends MapBase {
+class Landform extends LandformBase {
     pathFinder: PathFinder;
     private players = new CoordMultiMap();
 
     constructor() {
         super();
         this.pathFinder = new PathFinder(this);
+    }
+
+    /** @override */
+    getViewPoint(coord: Coord) {
+        var tile = super.getViewPoint(coord);
+        if (tile == null)
+            return Tile.Unknown;
+        return tile;
     }
 
     join(coord: Coord, player: Player) {
@@ -43,8 +53,8 @@ class Landform extends MapBase {
     /** override */
     /** @protected */
     requestViewPointChunk(coord: Coord) {
-        // DB‚Éæ‚è‚És‚Á‚½‚è
-        (callback => callback(null))((chunk: Chunk<vp.ViewPoint>) => {
+        // DBã«å–ã‚Šã«è¡Œã£ãŸã‚Š
+        (callback => callback(null))((chunk: Chunk<Tile>) => {
             if (chunk == null) {
                 chunk = createViewPointChunk();
                 if (coord.equals(Coord.fromNumber(-1, -1))) {
@@ -59,7 +69,7 @@ class Landform extends MapBase {
                 if (coord.equals(Coord.fromNumber(0, 0))) {
                     setEmpty(chunk, 0, 0, 4, 4);
                 }
-                // DB‚É‘‚«‚ŞH
+                // DBã«æ›¸ãè¾¼ã‚€ï¼Ÿ
             }
             this.viewPointChunks.putByCoord(coord, chunk);
             var clientChunk = this.toClientChunk(chunk, coord);
@@ -69,14 +79,10 @@ class Landform extends MapBase {
         });
     }
 
-    getClientViewPointChunk(coord: Coord): vp.ClientViewPoint[][] {
-        var chunk: Chunk<vp.ViewPoint>;
-        try {
-            chunk = super.getViewPointChunk(coord);
-        } catch (error) {
-            if (error.name !== ChunkNotFoundError.name)
-                throw error;
-            return null;
+    getClientViewPointChunk(coord: Coord): Chunk<ClientTile> {
+        var chunk = this.getViewPointChunk(coord);
+        if (chunk == null) {
+            chunk = createUnknownChunk();
         }
         return this.toClientChunk(chunk, coord);
     }
@@ -93,7 +99,7 @@ class Landform extends MapBase {
     }
 
     dig(coord: Coord) {
-        super.getViewPoint(coord).status = vp.Status.OPEN;
+        this.getViewPoint(coord).status = enums.Status.OPEN;
         var clientViewPoint = this.toClientViewPoint(this.getViewPoint(coord), coord);
         this.players.get(Chunk.coordFromGlobal(coord)).forEach(player => {
             player.putViewPoint(coord, clientViewPoint);
@@ -103,56 +109,68 @@ class Landform extends MapBase {
     flag(coord: Coord) {
     }
 
-    private toClientViewPoint(viewPoint: vp.ViewPoint, coord: Coord) {
+    private toClientViewPoint(tile: Tile, coord: Coord) {
+        if (tile == null)
+            return null;
         var around = this.getArounds(coord);
-        return new vp.ClientViewPoint(
-            viewPoint.status,
-            around.any(x => x.landform === vp.Landform.UNKNOWN) ? -1
-            : around.count(x=> x.landform === vp.Landform.BOMB));
+        return new ClientTile(
+            tile.status,
+            around.any(x => x.landform === enums.Landform.UNKNOWN) ? -1
+            : around.count(x=> x.landform === enums.Landform.BOMB));
     }
 
     /** 
      * @param chunk chunk
-     * @param coord chunk‚ÌÀ•W(ChunkÀ•WŒn)
+     * @param coord chunkã®åº§æ¨™(Chunkåº§æ¨™ç³»)
      */
-    private toClientChunk(chunk: Chunk<vp.ViewPoint>, chunkCoord: Coord) {
+    private toClientChunk(chunk: Chunk<Tile>, chunkCoord: Coord):Chunk<ClientTile> {
         var baseCoord = Chunk.toGlobal(chunkCoord);
-        return chunk.map((tile: vp.ViewPoint, coord?: Coord)
+        return chunk.map((tile: Tile, coord?: Coord)
             => this.toClientViewPoint(tile, baseCoord.add(coord)));
     }
 
     private getArounds(coord: Coord) {
         return Enumerable.from(coord.getArounds())
-            .select(x => super.getViewPoint(x));
+            .select(x => this.getViewPointWithoutRequest(x));
+    }
+
+    private getViewPointWithoutRequest(coord: Coord) {
+        try {
+            return this.viewPointChunks.getShred(coord);
+        } catch (error) {
+            if (error.name !== ChunkNotFoundError.name)
+                throw error;
+            return Tile.Unknown;
+        }
     }
 }
 
-function isMovable(viewPoint: vp.ViewPoint) {
-    return viewPoint.status === vp.Status.OPEN
-        && viewPoint.landform === vp.Landform.NONE;
+function isMovable(viewPoint: Tile) {
+    return viewPoint.status === enums.Status.OPEN
+        && viewPoint.landform === enums.Landform.NONE;
 }
 
-/** 16x16‚Ì’nŒ`‚ğì¬‚·‚é */
-function createViewPointChunk(): Chunk<vp.ViewPoint> {
-    var chunk: vp.ViewPoint[][] = [];
+/** 16x16ã®åœ°å½¢ã‚’ä½œæˆã™ã‚‹ */
+function createViewPointChunk(): Chunk<Tile> {
+    var chunk: Tile[][] = [];
     for (var y = 0; y < 16; y++) {
         var line = [];
         for (var x = 0; x < 16; x++) {
-            line.push(new vp.ViewPoint(
-                Math.random() < 0.4 ? vp.Landform.BOMB : vp.Landform.NONE,
-                vp.Status.CLOSE));
+            line.push(new Tile(
+                Math.random() < 0.4 ? enums.Landform.BOMB : enums.Landform.NONE,
+                enums.Status.CLOSE));
         }
         chunk.push(line);
     }
-    return new Chunk<vp.ViewPoint>(chunk);
+    return new Chunk<any>(chunk);// HACK: Client<Tile>ã¨ã™ã¹ã
 }
 
-function setEmpty(chunk: Chunk<vp.ViewPoint>, xBegin: number, yBegin: number, xEnd: number, yEnd: number) {
+function setEmpty(chunk: Chunk<Tile>, xBegin: number, yBegin: number, xEnd: number, yEnd: number) {
     for (var y = yBegin; y < yEnd; y++) {
         for (var x = xBegin; x < xEnd; x++) {
             var viewPoint = chunk.get(x, y);
-            viewPoint.status = vp.Status.OPEN;
-            viewPoint.landform = vp.Landform.NONE;
+            viewPoint.status = enums.Status.OPEN;
+            viewPoint.landform = enums.Landform.NONE;
         }
     }
 }
@@ -164,4 +182,12 @@ class CoordMultiMap extends MultiMap<Coord, Player> {
     }
 }
 
-var __scope: MultiMap<any, any> = new MultiMap<any, any>();// MultiMap‚Ìimport‚ªÁ‚¦‚é‚½‚ß‚â‚Ş‚È‚­
+function createUnknownChunk(): Chunk<Tile> {
+    return new Chunk(Enumerable.generate(() =>
+        Enumerable.generate(() =>
+            new Tile(enums.Landform.UNKNOWN, enums.Status.UNKNOWN),
+            16).toArray(),
+        16).toArray());
+}
+
+var __scope: MultiMap<any, any> = new MultiMap<any, any>();// MultiMapã®importãŒæ¶ˆãˆã‚‹ãŸã‚ã‚„ã‚€ãªã

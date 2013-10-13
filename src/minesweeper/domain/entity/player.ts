@@ -1,7 +1,9 @@
 var log4js = require('log4js');
 import ee2 = require('eventemitter2');
+import Chunk = require('./../../../minesweeper-common/domain/entity/chunk');
+import enums = require('./../../../minesweeper-common/domain/valueobject/enums');
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
-import vp = require('./../../../minesweeper-common/domain/valueobject/viewpoint');
+import ClientTile = require('./../../../minesweeper-common/domain/valueobject/clienttile');
 import ifs = require('./../../../minesweeper-common/infrastructure/valueobject/interfaces');
 import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo');
 import Landform = require('./landform');
@@ -65,11 +67,11 @@ class Player extends ee2.EventEmitter2 {
         this.field = field;
     }
 
-    putChunk(coord: Coord, chunk: vp.ClientViewPoint[][]) {
-        this.emitter.emit('chunk', { coord: cdxo.fromCoord(coord), chunk: chunk });
+    putChunk(coord: Coord, chunk: Chunk<ClientTile>) {
+        this.emitter.emit('chunk', { coord: cdxo.fromCoord(coord), chunk: chunk.items });
     }
 
-    putViewPoint(coord: Coord, viewPoint: vp.ClientViewPoint) {
+    putViewPoint(coord: Coord, viewPoint: ClientTile) {
         this.emitter.emit('view_point', { coord: cdxo.fromCoord(coord), viewPoint: viewPoint});
     }
 
