@@ -1,5 +1,7 @@
 var log4js = require('log4js');
+import Enumerable = require('./../../../lib/linq');
 import MapBase = require('./../../../minesweeper-common/domain/entity/mapbase');
+import Chunk = require('./../../../minesweeper-common/domain/entity/chunk');
 import ChunkNotFoundError = require('./../../../minesweeper-common/domain/entity/chunknotfounderror');
 import vp = require('./../../../minesweeper-common/domain/valueobject/viewpoint');
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
@@ -22,7 +24,7 @@ class Landform extends MapBase {
     join(coord: Coord, player: Player) {
         logger.debug('player join to: ' + coord.toString());
         this.players.put(coord, player);
-        var chunk = this.getViewPointChunk(coord);
+        var chunk = this.getClientViewPointChunk(coord);
         if (chunk == null)
             return;
         player.putChunk(coord, chunk);
@@ -42,7 +44,7 @@ class Landform extends MapBase {
     /** @protected */
     requestViewPointChunk(coord: Coord) {
         // DBに取りに行ったり
-        (callback => callback(null))((chunk: vp.ViewPoint[][]) => {
+        (callback => callback(null))((chunk: Chunk<vp.ViewPoint>) => {
             if (chunk == null) {
                 chunk = createViewPointChunk();
                 if (coord.equals(Coord.fromNumber(-1, -1))) {
@@ -60,20 +62,23 @@ class Landform extends MapBase {
                 // DBに書き込む？
             }
             this.viewPointChunks.putByCoord(coord, chunk);
+            var clientChunk = this.toClientChunk(chunk, coord);
             this.players.get(coord).forEach(player => {
-                player.putChunk(coord, chunk);
+                player.putChunk(coord, clientChunk);
             });
         });
     }
 
-    getViewPointChunk(coord: Coord) {
+    getClientViewPointChunk(coord: Coord): vp.ClientViewPoint[][] {
+        var chunk: Chunk<vp.ViewPoint>;
         try {
-            return super.getViewPointChunk(coord);
+            chunk = super.getViewPointChunk(coord);
         } catch (error) {
             if (error.name !== ChunkNotFoundError.name)
                 throw error;
             return null;
         }
+        return this.toClientChunk(chunk, coord);
     }
 
     move(player: Player, to: Coord) {
@@ -88,19 +93,38 @@ class Landform extends MapBase {
     }
 
     dig(coord: Coord) {
-        var viewPoint = super.getViewPoint(coord);
-        viewPoint.status = vp.Status.OPEN;
-        this.players.get(globalToChunk(coord)).forEach(player => {
-            player.putViewPoint(coord, viewPoint);
+        super.getViewPoint(coord).status = vp.Status.OPEN;
+        var clientViewPoint = this.toClientViewPoint(this.getViewPoint(coord), coord);
+        this.players.get(Chunk.coordFromGlobal(coord)).forEach(player => {
+            player.putViewPoint(coord, clientViewPoint);
         });
     }
 
     flag(coord: Coord) {
     }
-}
 
-function globalToChunk(coord: Coord): Coord {
-    return new Coord(coord.x.shiftRight(4), coord.y.shiftRight(4));
+    private toClientViewPoint(viewPoint: vp.ViewPoint, coord: Coord) {
+        var around = this.getArounds(coord);
+        return new vp.ClientViewPoint(
+            viewPoint.status,
+            around.any(x => x.landform === vp.Landform.UNKNOWN) ? -1
+            : around.count(x=> x.landform === vp.Landform.BOMB));
+    }
+
+    /** 
+     * @param chunk chunk
+     * @param coord chunkの座標(Chunk座標系)
+     */
+    private toClientChunk(chunk: Chunk<vp.ViewPoint>, chunkCoord: Coord) {
+        var baseCoord = Chunk.toGlobal(chunkCoord);
+        return chunk.map((tile: vp.ViewPoint, coord?: Coord)
+            => this.toClientViewPoint(tile, baseCoord.add(coord)));
+    }
+
+    private getArounds(coord: Coord) {
+        return Enumerable.from(coord.getArounds())
+            .select(x => super.getViewPoint(x));
+    }
 }
 
 function isMovable(viewPoint: vp.ViewPoint) {
@@ -109,8 +133,8 @@ function isMovable(viewPoint: vp.ViewPoint) {
 }
 
 /** 16x16の地形を作成する */
-function createViewPointChunk(): vp.ViewPoint[][] {
-    var chunk = [];
+function createViewPointChunk(): Chunk<vp.ViewPoint> {
+    var chunk: vp.ViewPoint[][] = [];
     for (var y = 0; y < 16; y++) {
         var line = [];
         for (var x = 0; x < 16; x++) {
@@ -120,14 +144,15 @@ function createViewPointChunk(): vp.ViewPoint[][] {
         }
         chunk.push(line);
     }
-    return chunk;
+    return new Chunk<vp.ViewPoint>(chunk);
 }
 
-function setEmpty(chunk: vp.ViewPoint[][], xBegin: number, yBegin: number, xEnd: number, yEnd: number) {
+function setEmpty(chunk: Chunk<vp.ViewPoint>, xBegin: number, yBegin: number, xEnd: number, yEnd: number) {
     for (var y = yBegin; y < yEnd; y++) {
         for (var x = xBegin; x < xEnd; x++) {
-            chunk[y][x].status = vp.Status.OPEN;
-            chunk[y][x].landform = vp.Landform.NONE;
+            var viewPoint = chunk.get(x, y);
+            viewPoint.status = vp.Status.OPEN;
+            viewPoint.landform = vp.Landform.NONE;
         }
     }
 }

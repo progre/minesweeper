@@ -19,7 +19,7 @@ class PathFinder {
                 return createPath(closeList, lowNode);// 経路完成
             }
             closeList.push(lowNode);
-            lowNode.getAroundCoords().forEach((around: Coord) => {
+            lowNode.coord.getArounds().forEach((around: Coord) => {
                 if (openList.contains(around) || contains(closeList, around))
                     return;// continue
                 if (!around.equals(to) && !this.field.isMovable(around))
@@ -73,19 +73,6 @@ class Node {
 
     totalCost() {
         return this.cost + this.heuristic;
-    }
-
-    /** 指定位置の周りの8タイルを返す */
-    getAroundCoords() {
-        var coord = this.coord;
-        return [new Coord(coord.x.subtract(BigInteger.ONE), coord.y.subtract(BigInteger.ONE)),
-            new Coord(coord.x, coord.y.subtract(BigInteger.ONE)),
-            new Coord(coord.x.add(BigInteger.ONE), coord.y.subtract(BigInteger.ONE)),
-            new Coord(coord.x.subtract(BigInteger.ONE), coord.y),
-            new Coord(coord.x.add(BigInteger.ONE), coord.y),
-            new Coord(coord.x.subtract(BigInteger.ONE), coord.y.add(BigInteger.ONE)),
-            new Coord(coord.x, coord.y.add(BigInteger.ONE)),
-            new Coord(coord.x.add(BigInteger.ONE), coord.y.add(BigInteger.ONE))];
     }
 }
 

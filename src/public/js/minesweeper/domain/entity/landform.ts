@@ -14,12 +14,12 @@ class Landform extends MapBase {
 
     setEmitter(emitter: ee2.EventEmitter2) {
         this.emitter = emitter;
-        emitter.on('chunk', (obj: { coord: ifs.ICoordDTO; chunk: vp.ViewPoint[][] }) => {
+        emitter.on('chunk', (obj: { coord: ifs.ICoordDTO; chunk: vp.ClientViewPoint[][] }) => {
             console.log('Chunk' + cdxo.toCoord(obj.coord).toString() + 'を受信しました');
             delete this.joinRequests[obj.coord.toString()];
             this.putViewPointChunk(cdxo.toCoord(obj.coord), obj.chunk);
         });
-        emitter.on('view_point', (obj: { coord: ifs.ICoordDTO; viewPoint: vp.ViewPoint }) => {
+        emitter.on('view_point', (obj: { coord: ifs.ICoordDTO; viewPoint: vp.ClientViewPoint }) => {
             console.log('viewPoint' + cdxo.toCoord(obj.coord).toString() + 'を受信しました');
             this.putViewPoint(cdxo.toCoord(obj.coord), obj.viewPoint);
         });

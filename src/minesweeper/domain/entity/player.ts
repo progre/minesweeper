@@ -65,11 +65,11 @@ class Player extends ee2.EventEmitter2 {
         this.field = field;
     }
 
-    putChunk(coord: Coord, chunk: vp.ViewPoint[][]) {
+    putChunk(coord: Coord, chunk: vp.ClientViewPoint[][]) {
         this.emitter.emit('chunk', { coord: cdxo.fromCoord(coord), chunk: chunk });
     }
 
-    putViewPoint(coord: Coord, viewPoint: vp.ViewPoint) {
+    putViewPoint(coord: Coord, viewPoint: vp.ClientViewPoint) {
         this.emitter.emit('view_point', { coord: cdxo.fromCoord(coord), viewPoint: viewPoint});
     }
 
