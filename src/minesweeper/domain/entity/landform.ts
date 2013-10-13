@@ -82,7 +82,7 @@ class Landform extends LandformBase {
     getClientViewPointChunk(coord: Coord): Chunk<ClientTile> {
         var chunk = this.getViewPointChunk(coord);
         if (chunk == null) {
-            chunk = createUnknownChunk();
+            return null;
         }
         return this.toClientChunk(chunk, coord);
     }
@@ -100,7 +100,7 @@ class Landform extends LandformBase {
 
     dig(coord: Coord) {
         this.getViewPoint(coord).status = enums.Status.OPEN;
-        var clientViewPoint = this.toClientViewPoint(this.getViewPoint(coord), coord);
+        var clientViewPoint = this.toClientTile(this.getViewPoint(coord), coord);
         this.players.get(Chunk.coordFromGlobal(coord)).forEach(player => {
             player.putViewPoint(coord, clientViewPoint);
         });
@@ -109,13 +109,13 @@ class Landform extends LandformBase {
     flag(coord: Coord) {
     }
 
-    private toClientViewPoint(tile: Tile, coord: Coord) {
+    private toClientTile(tile: Tile, coord: Coord) {
         if (tile == null)
             return null;
         var around = this.getArounds(coord);
         return new ClientTile(
             tile.status,
-            tile.landform === enums.Landform.BOMB ? -1
+            tile.landform === enums.Landform.BOMB ? 9
             : around.any(x => x.landform === enums.Landform.UNKNOWN) ? -1
             : around.count(x=> x.landform === enums.Landform.BOMB));
     }
@@ -127,7 +127,7 @@ class Landform extends LandformBase {
     private toClientChunk(chunk: Chunk<Tile>, chunkCoord: Coord): Chunk<ClientTile> {
         var baseCoord = Chunk.toGlobal(chunkCoord);
         return chunk.map((tile: Tile, coord?: Coord)
-            => this.toClientViewPoint(tile, baseCoord.add(coord)));
+            => this.toClientTile(tile, baseCoord.add(coord)));
     }
 
     private getArounds(coord: Coord) {

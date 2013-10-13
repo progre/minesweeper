@@ -20,7 +20,7 @@ class MineWorld {
 
     /** プレイヤーを作ってリポジトリに保存する */
     createPlayer() {
-        var player = new Player(Coord.of('0', '0'), 'remilia', null);
+        var player = Player.create();
         return playersRepository.create(player);
     }
 

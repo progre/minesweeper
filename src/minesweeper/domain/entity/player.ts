@@ -1,5 +1,6 @@
 var log4js = require('log4js');
 import ee2 = require('eventemitter2');
+import Enumerable = require('./../../../lib/linq');
 import Chunk = require('./../../../minesweeper-common/domain/entity/chunk');
 import enums = require('./../../../minesweeper-common/domain/valueobject/enums');
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
@@ -10,6 +11,8 @@ import Landform = require('./landform');
 
 var logger = log4js.getLogger();
 
+var firstTime = true;
+
 export = Player;
 class Player extends ee2.EventEmitter2 {
     private events: { event: string; listener: Function }[] = [];
@@ -17,6 +20,20 @@ class Player extends ee2.EventEmitter2 {
     private path: Coord[];
     /** 視界 */
     private field: Landform;
+
+    static create() {
+        var image = Enumerable.from([
+            'hiyoko',
+            'hiyoko_lady',
+            'mecha_hiyoko',
+            'niwatori',
+            'waru_hiyoko']).shuffle().first();
+        if (firstTime) {
+            firstTime = false;
+            image = 'remilia';
+        }
+        return new Player(Coord.of('0', '0'), image, null);
+    }
 
     constructor(
         public coord: Coord,
@@ -72,7 +89,7 @@ class Player extends ee2.EventEmitter2 {
     }
 
     putViewPoint(coord: Coord, viewPoint: ClientTile) {
-        this.emitter.emit('view_point', { coord: cdxo.fromCoord(coord), viewPoint: viewPoint});
+        this.emitter.emit('view_point', { coord: cdxo.fromCoord(coord), viewPoint: viewPoint });
     }
 
     private beginMove(intent: Intent, to: Coord) {

@@ -113,8 +113,9 @@ function updateBlock(block: createjs.BitmapAnimation, label: createjs.BitmapAnim
             label.visible = true;
             break;
     }
-    label.gotoAndPlay(tile == null || tile.status === enums.Status.UNKNOWN ? '?'
-        : tile.mines === -1 ? 'M'
+    label.gotoAndPlay(
+        tile == null || tile.status === enums.Status.UNKNOWN || tile.mines < 0 ? '?'
+        : tile.mines >= 9 ? 'M'
         : tile.mines.toString());
 }
 

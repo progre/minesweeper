@@ -4,20 +4,19 @@ import ActivePlayers = require('./../domain/entity/activeplayers');
 import Camera = require('./entity/camera');
 
 class PlayerView {
-    static resourceFiles = ['/img/remilia.png'];
+    static resourceFiles = [
+        '/img/remilia.png',
+        '/img/hiyoco_nomal_full.png',
+        '/img/hiyoco_lady_full.png',
+        '/img/hiyoco_mecha_full.png',
+        '/img/hiyoco_niwatori_full.png',
+        '/img/hiyoco_waru_full.png'
+    ];
 
     displayObject: createjs.BitmapAnimation;
 
     constructor(private loadQueue: createjs.LoadQueue, private model: ifs.IPlayer, private camera: Camera) {
-        var ssOpt = {
-            images: [this.loadQueue.getResult('/img/remilia.png')],
-            frames: { width: 32, height: 32 },
-            animations: {
-                'walk': { frames: [0, 1, 2, 1], frequency: 6 }
-            }
-        };
-        var ss = new createjs.SpriteSheet(ssOpt);
-        this.displayObject = new createjs.BitmapAnimation(ss);
+        this.displayObject = this.getCharactor(model.image);
         this.displayObject.gotoAndPlay('walk');
 
         this.updatePosition();
@@ -31,6 +30,48 @@ class PlayerView {
         this.displayObject.x = pos.x;
         this.displayObject.y = pos.y - 8;
     }
+
+    private getCharactor(name: string) {
+        var ssOpt = {
+            images: [],
+            frames: { width: 32, height: 32 },
+            animations: {
+                'walk': { frames: [], frequency: 6 }
+            }
+        };
+        if (name === 'remilia') {
+            ssOpt.images = [this.loadQueue.getResult('/img/remilia.png')];
+            ssOpt.animations['walk'].frames = [0, 1, 2, 1];
+        } else {
+            ssOpt.images = [this.loadQueue.getResult(toFileName(name))];
+            ssOpt.animations['walk'].frames = [6, 7, 8, 7];
+        }
+        var ss = new createjs.SpriteSheet(ssOpt);
+        return new createjs.BitmapAnimation(ss);
+    }
+}
+
+function toFileName(name: string) {
+    switch (name) {
+        case 'hiyoko': return '/img/hiyoco_nomal_full.png';
+        case 'hiyoko_lady': return '/img/hiyoco_lady_full.png';
+        case 'mecha_hiyoko': return '/img/hiyoco_mecha_full.png';
+        case 'niwatori': return '/img/hiyoco_niwatori_full.png';
+        case 'waru_hiyoko': return '/img/hiyoco_waru_full.png';
+    }
+}
+
+function getHiyoko() {
+
+    var ssOpt = {
+        images: [this.loadQueue.getResult('/img/hiyoco_nomal_full.png')],
+        frames: { width: 32, height: 32 },
+        animations: {
+            'walk': { frames: [0, 1, 2, 1], frequency: 6 }
+        }
+    };
+    var ss = new createjs.SpriteSheet(ssOpt);
+    return new createjs.BitmapAnimation(ss);
 }
 
 export = ActivePlayersView;
