@@ -1,5 +1,5 @@
 import game = require('./../../framework/game');
-import vp = require('./../../minesweeper-common/domain/valueobject/viewpoint');
+import enums = require('./../../minesweeper-common/domain/valueobject/enums');
 import Coord = require('./../../minesweeper-common/domain/valueobject/coord');
 import Landform = require('./../domain/entity/landform');
 import Camera = require('./entity/camera');
@@ -71,14 +71,18 @@ class LandformView {
                 var block = this.blocks[row][col];
                 block.x = left + col * 32;
                 block.y = top + row * 32;
-                switch (this.landform.getViewPoint(this.camera.fromRelativeToAbsolute(col - colCenter, row - rowCenter)).status) {
-                    case vp.Status.UNKNOWN:
+                var tile = this.landform.getViewPoint(
+                    this.camera.fromRelativeToAbsolute(
+                        col - colCenter,
+                        row - rowCenter));
+                switch (tile == null ? enums.Status.UNKNOWN : tile.status) {
+                    case enums.Status.UNKNOWN:
                         block.gotoAndPlay('unknown');
                         break;
-                    case vp.Status.CLOSE:
+                    case enums.Status.CLOSE:
                         block.gotoAndPlay('close');
                         break;
-                    case vp.Status.OPEN:
+                    case enums.Status.OPEN:
                         block.gotoAndPlay('open');
                         break;
                 }

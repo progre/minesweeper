@@ -1,25 +1,28 @@
 import ee2 = require('eventemitter2');
 import Enumerable = require('./../../../lib/linq');
-import MapBase = require('./../../../minesweeper-common/domain/entity/mapbase');
-import vp = require('./../../../minesweeper-common/domain/valueobject/viewpoint');
+import LandformBase = require('./../../../minesweeper-common/domain/entity/landformbase');
+import Chunk = require('./../../../minesweeper-common/domain/entity/chunk');
+import enums = require('./../../../minesweeper-common/domain/valueobject/enums');
+import ClientTile = require('./../../../minesweeper-common/domain/valueobject/clienttile');
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
 import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo');
 import ifs = require('./../../../minesweeper-common/infrastructure/valueobject/interfaces');
 
 export = Landform;
-
-class Landform extends MapBase {
+class Landform extends LandformBase {
     private emitter: ee2.EventEmitter2;
     private joinRequests: { [coord: string]: Date } = {};
 
     setEmitter(emitter: ee2.EventEmitter2) {
         this.emitter = emitter;
-        emitter.on('chunk', (obj: { coord: ifs.ICoordDTO; chunk: vp.ClientViewPoint[][] }) => {
+        emitter.on('chunk', (obj: { coord: ifs.ICoordDTO; chunk: ClientTile[][] }) => {
             console.log('Chunk' + cdxo.toCoord(obj.coord).toString() + 'を受信しました');
             delete this.joinRequests[obj.coord.toString()];
-            this.putViewPointChunk(cdxo.toCoord(obj.coord), obj.chunk);
+            this.putViewPointChunk(
+                cdxo.toCoord(obj.coord),
+                new Chunk<any>(obj.chunk));// HACK: Chunk<ClientTile>とすべき
         });
-        emitter.on('view_point', (obj: { coord: ifs.ICoordDTO; viewPoint: vp.ClientViewPoint }) => {
+        emitter.on('view_point', (obj: { coord: ifs.ICoordDTO; viewPoint: ClientTile }) => {
             console.log('viewPoint' + cdxo.toCoord(obj.coord).toString() + 'を受信しました');
             this.putViewPoint(cdxo.toCoord(obj.coord), obj.viewPoint);
         });
@@ -43,12 +46,4 @@ class Landform extends MapBase {
         this.emitter.emit('join_chunk', cdxo.fromCoord(coord));
         console.log('Chunk' + coord.toString() + 'を要求しました');
     }
-}
-
-function createUnknownPlace(): vp.ViewPoint[][] {
-    return Enumerable.generate(() =>
-        Enumerable.generate(() =>
-            new vp.ViewPoint(vp.Landform.UNKNOWN, vp.Status.UNKNOWN),
-            16).toArray(),
-        16).toArray();
 }
