@@ -24,7 +24,7 @@ class Landform extends LandformBase {
     }
 
     /** @override */
-    getViewPoint(coord: Coord) {
+    getViewPoint(coord: Coord): Tile {
         var tile = super.getViewPoint(coord);
         if (tile == null)
             return Tile.Unknown;
@@ -115,7 +115,8 @@ class Landform extends LandformBase {
         var around = this.getArounds(coord);
         return new ClientTile(
             tile.status,
-            around.any(x => x.landform === enums.Landform.UNKNOWN) ? -1
+            tile.landform === enums.Landform.BOMB ? -1
+            : around.any(x => x.landform === enums.Landform.UNKNOWN) ? -1
             : around.count(x=> x.landform === enums.Landform.BOMB));
     }
 
@@ -123,7 +124,7 @@ class Landform extends LandformBase {
      * @param chunk chunk
      * @param coord chunkの座標(Chunk座標系)
      */
-    private toClientChunk(chunk: Chunk<Tile>, chunkCoord: Coord):Chunk<ClientTile> {
+    private toClientChunk(chunk: Chunk<Tile>, chunkCoord: Coord): Chunk<ClientTile> {
         var baseCoord = Chunk.toGlobal(chunkCoord);
         return chunk.map((tile: Tile, coord?: Coord)
             => this.toClientViewPoint(tile, baseCoord.add(coord)));

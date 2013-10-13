@@ -98,9 +98,8 @@ class Player extends ee2.EventEmitter2 {
             }
             switch (intent) {
                 case Intent.FLAG: this.field.flag(coord); return;
-                case Intent.DIGGING: this.field.dig(coord); break;// 続行
+                case Intent.DIGGING: this.field.dig(coord); return;
             }
-            this.path.push(coord);
         }
         super.emit('moved', this.coord);
         this.movingTimeoutId = setTimeout(() => {
