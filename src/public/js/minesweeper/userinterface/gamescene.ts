@@ -5,7 +5,7 @@ import MineWorldView = require('./mineworldview');
 
 export = GameScene;
 class GameScene implements game.Scene {
-    static resourceFiles = ['/img/block.png'].concat(MineWorldView.resourceFiles);
+    static resourceFiles = MineWorldView.resourceFiles;
 
     displayObject = new createjs.Container();
     private mineWorld = new MineWorld();

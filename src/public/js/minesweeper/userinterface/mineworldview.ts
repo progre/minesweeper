@@ -8,7 +8,7 @@ import LandformView = require('./landformview');
 
 export = MineWorldView;
 class MineWorldView {
-    static resourceFiles = ActivePlayersView.resourceFiles;
+    static resourceFiles = ActivePlayersView.resourceFiles.concat(LandformView.resourceFiles);
 
     displayObject = new createjs.Container();
     private clickObject = createWall();
@@ -50,6 +50,7 @@ class MineWorldView {
         this.displayObject.addChild(this.clickObject);
         this.displayObject.addChild(this.landformView.backDisplayObject);
         this.displayObject.addChild(this.activePlayersView.displayObject);
+        this.displayObject.addChild(this.landformView.frontDisplayObject);
     }
 
     /** •`‰æƒGƒŠƒAŽw’è */
