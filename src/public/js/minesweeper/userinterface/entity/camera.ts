@@ -13,12 +13,12 @@ class Camera extends ee2.EventEmitter2 {
         super.emit('moved', null);
     }
 
-    /** ÀÀ•W¨•\¦À•W */
+    /** å®Ÿåº§æ¨™â†’è¡¨ç¤ºåº§æ¨™ */
     fromAbsoluteToRelative(target: Coord) {
         return target.subtract(this.center);
     }
 
-    /** ÀÀ•W¨•\¦•`‰æÀ•W */
+    /** å®Ÿåº§æ¨™â†’è¡¨ç¤ºæç”»åº§æ¨™ */
     fromAbsoluteToDisplay(target: Coord) {
         var relative = this.fromAbsoluteToRelative(target);
         return {
@@ -27,7 +27,7 @@ class Camera extends ee2.EventEmitter2 {
         };
     }
 
-    /** •\¦•`‰æÀ•W¨•\¦À•W */
+    /** è¡¨ç¤ºæç”»åº§æ¨™â†’è¡¨ç¤ºåº§æ¨™ */
     private fromDisplayToRelative(x: number, y: number) {
         return {
             x: Math.round(x / 32),
@@ -35,12 +35,12 @@ class Camera extends ee2.EventEmitter2 {
         };
     }
 
-    /** •\¦À•W¨ÀÀ•W */
+    /** è¡¨ç¤ºåº§æ¨™â†’å®Ÿåº§æ¨™ */
     fromRelativeToAbsolute(x: number, y: number) {
         return Coord.fromNumber(x, y).add(this.center);
     }
 
-    /** •\¦•`‰æÀ•W(’†S‚ª0)¨ÀÀ•W */
+    /** è¡¨ç¤ºæç”»åº§æ¨™(ä¸­å¿ƒãŒ0)â†’å®Ÿåº§æ¨™ */
     fromDisplayToAbsolute(x: number, y: number) {
         var pos = this.fromDisplayToRelative(x, y);
         return this.fromRelativeToAbsolute(pos.x, pos.y);
