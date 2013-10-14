@@ -164,7 +164,7 @@ function createViewPointChunk(): Chunk<Tile> {
         var line = [];
         for (var x = 0; x < 16; x++) {
             line.push(new Tile(
-                Math.random() < 0.4 ? enums.Landform.BOMB : enums.Landform.NONE,
+                Math.random() < 0.25 ? enums.Landform.BOMB : enums.Landform.NONE,
                 enums.Status.CLOSE));
         }
         chunk.push(line);
