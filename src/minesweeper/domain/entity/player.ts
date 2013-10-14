@@ -84,12 +84,16 @@ class Player extends ee2.EventEmitter2 {
         this.field = field;
     }
 
-    putChunk(coord: Coord, chunk: Chunk<ClientTile>) {
+    notifyChunk(coord: Coord, chunk: Chunk<ClientTile>) {
         this.emitter.emit('chunk', { coord: cdxo.fromCoord(coord), chunk: chunk.items });
     }
 
-    putViewPoint(coord: Coord, viewPoint: ClientTile) {
+    notifyTile(coord: Coord, viewPoint: ClientTile) {
         this.emitter.emit('view_point', { coord: cdxo.fromCoord(coord), viewPoint: viewPoint });
+    }
+
+    notifyExploded(coord: Coord) {
+        this.emitter.emit('exploded', cdxo.fromCoord(coord));
     }
 
     private beginMove(intent: Intent, to: Coord) {

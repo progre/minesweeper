@@ -37,7 +37,7 @@ class Landform extends LandformBase {
         var chunk = this.getClientViewPointChunk(coord);
         if (chunk == null)
             return;
-        player.putChunk(coord, chunk);
+        player.notifyChunk(coord, chunk);
     }
 
     defect(coord: Coord, player: Player) {
@@ -74,7 +74,7 @@ class Landform extends LandformBase {
             this.viewPointChunks.putByCoord(coord, chunk);
             var clientChunk = this.toClientChunk(chunk, coord);
             this.players.get(coord).forEach(player => {
-                player.putChunk(coord, clientChunk);
+                player.notifyChunk(coord, clientChunk);
             });
         });
     }
@@ -99,11 +99,17 @@ class Landform extends LandformBase {
     }
 
     dig(coord: Coord) {
-        this.getViewPoint(coord).status = enums.Status.OPEN;
-        var clientViewPoint = this.toClientTile(this.getViewPoint(coord), coord);
-        this.players.get(Chunk.coordFromGlobal(coord)).forEach(player => {
-            player.putViewPoint(coord, clientViewPoint);
-        });
+        var tile = this.getViewPoint(coord);
+        tile.status = enums.Status.OPEN;
+        var clientTile = this.toClientTile(tile, coord);
+        var players = this.players.get(Chunk.coordFromGlobal(coord));
+        if (tile.landform === enums.Landform.BOMB) {
+            players.forEach(player => 
+                player.notifyExploded(coord)); // これだけでtileがopenでbombなことも伝わる
+        } else {
+            players.forEach(player =>
+                player.notifyTile(coord, clientTile));
+        }
     }
 
     flag(coord: Coord) {
