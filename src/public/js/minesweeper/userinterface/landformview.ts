@@ -1,32 +1,34 @@
 import game = require('./../../framework/game');
-import enums = require('./../../minesweeper-common/domain/valueobject/enums');
 import Coord = require('./../../minesweeper-common/domain/valueobject/coord');
+import ClientTile = require('./../../minesweeper-common/domain/valueobject/clienttile');
 import Landform = require('./../domain/entity/landform');
 import Camera = require('./entity/camera');
 import dos = require('./displayobjects');
+import TileView = require('./tileview');
 
 export = LandformView;
 class LandformView {
-    static resourceFiles = ['/img/block.png', '/img/numbers.png', '/img/explosion3.png'];
+    static resourceFiles = ['/img/block.png', '/img/numbers.png', '/img/explosion3.png', '/img/layers.png'];
 
     backDisplayObject = new createjs.Container();
     frontDisplayObject = new createjs.Container();
-    topLayer = new createjs.Container();
-    rearLayer = new createjs.Container();
-    private templateBlock: createjs.BitmapAnimation;
-    private templateLabel: createjs.BitmapAnimation;
-    private templateExplosion: createjs.BitmapAnimation;
-    private blocks: createjs.BitmapAnimation[][] = [[]];
-    private labels: createjs.BitmapAnimation[][] = [[]];
+    layer = new createjs.Container();
+    cachelessLayer = new createjs.Container();
+    private baseTemplate: createjs.BitmapAnimation;
+    private lowLayerTemplate: createjs.BitmapAnimation;
+    private highLayerTemplate: createjs.BitmapAnimation;
+    private explosionTemplate: createjs.BitmapAnimation;
+    private tiles: TileView[][] = [[]];
     /** åªç›ÇÃï`âÊóÃàÊ */
     private rect: game.Rect;
 
     constructor(private loadQueue: createjs.LoadQueue, private landform: Landform, private camera: Camera) {
-        this.templateBlock = dos.createTemplateBlock(loadQueue);
-        this.templateLabel = dos.createTemplateLabel(loadQueue);
-        this.templateExplosion = dos.createTemplateExplosion(loadQueue);
-        this.frontDisplayObject.addChild(this.rearLayer);
-        this.frontDisplayObject.addChild(this.topLayer);
+        this.baseTemplate = dos.createBaseTemplate(loadQueue);
+        this.lowLayerTemplate = dos.createLowLayerTemplate(loadQueue);
+        this.highLayerTemplate = dos.createHighLayerTemplate(loadQueue);
+        this.explosionTemplate = dos.createExplosionTemplate(loadQueue);
+        this.frontDisplayObject.addChild(this.layer);
+        this.frontDisplayObject.addChild(this.cachelessLayer);
         landform.on('chunk_updated', (coord: Coord) => {
             this.updateBlocks();
         });
@@ -34,14 +36,12 @@ class LandformView {
             this.updateBlocks();
         });
         landform.on('exploded', (coord: Coord) => {
-            var exp = this.templateExplosion.clone();
-            this.topLayer.addChild(exp);
+            var exp = this.explosionTemplate.clone();
+            this.cachelessLayer.addChild(exp);
             var absCoord = this.camera.fromAbsoluteToDisplay(coord);
-            exp.play();
             exp.x = absCoord.x + 8 - 108;
             exp.y = absCoord.y + 8 - 108;
-            exp.onAnimationEnd = () => this.topLayer.removeChild(exp);
-            exp.compositeOperation = "lighter";
+            exp.onAnimationEnd = () => this.cachelessLayer.removeChild(exp);
         });
     }
 
@@ -52,7 +52,7 @@ class LandformView {
 
     refreshBlocks() {
         this.backDisplayObject.removeAllChildren();
-        this.rearLayer.removeAllChildren();
+        this.layer.removeAllChildren();
 
         // ÉuÉçÉbÉNàÍÇ¬ÇÕ32px
         var colCount = this.rect.width / 32 | 0;
@@ -65,51 +65,45 @@ class LandformView {
             rowCount++;
         }
         rowCount += 2;
-        this.blocks = [];
-        this.labels = [];
+        this.tiles = [];
         for (var row = 0; row < rowCount; row++) {
-            var blockLine: createjs.BitmapAnimation[] = [];
-            var labelLine: createjs.BitmapAnimation[] = [];
+            var tileLine: TileView[] = [];
             for (var col = 0; col < colCount; col++) {
-                var block = this.templateBlock.clone();
-                blockLine.push(block);
-                this.backDisplayObject.addChild(block);
-                var label = this.templateLabel.clone();
-                labelLine.push(label);
-                this.rearLayer.addChild(label);
+                var base = this.baseTemplate.clone();
+                this.backDisplayObject.addChild(base);
+                var lowLayer = this.lowLayerTemplate.clone();
+                this.backDisplayObject.addChild(lowLayer);
+                var highLayer = this.highLayerTemplate.clone();
+                this.layer.addChild(highLayer);
+                tileLine.push(new TileView(base, lowLayer, highLayer));
             }
-            this.blocks.push(blockLine);
-            this.labels.push(labelLine);
+            this.tiles.push(tileLine);
         }
         this.updateBlocks();
     }
 
     private updateBlocks() {
-        if (this.blocks == null || this.blocks.length <= 0)
+        if (this.tiles == null || this.tiles.length <= 0)
             return;
-        var rows = this.blocks.length;
+        var rows = this.tiles.length;
         var rowCenter = rows >> 1;
-        var cols = this.blocks[0].length;
+        var cols = this.tiles[0].length;
         var colCenter = cols >> 1;
         var top = -(rows >> 1) * 32 - 16;
         var left = -(cols >> 1) * 32 - 16;
         for (var row = 0; row < rows; row++) {
             for (var col = 0; col < cols; col++) {
-                var block = this.blocks[row][col];
-                block.x = left + col * 32;
-                block.y = top + row * 32;
-                var label = this.labels[row][col];
-                label.x = left + col * 32;
-                label.y = top + row * 32;
-                var tile = this.landform.getViewPoint(
+                var tile = this.tiles[row][col];
+                tile.setPos(left + col * 32, top + row * 32);
+                var model: ClientTile = this.landform.getViewPoint(
                     this.camera.fromRelativeToAbsolute(
                         col - colCenter,
                         row - rowCenter));
-                dos.updateBlock(block, label, tile);
+                tile.update(model);
             }
         }
         this.backDisplayObject.cache(left, top, cols * 32, rows * 32);
-        this.rearLayer.cache(left, top, cols * 32, rows * 32);
+        this.layer.cache(left, top, cols * 32, rows * 32);
     }
 }
 

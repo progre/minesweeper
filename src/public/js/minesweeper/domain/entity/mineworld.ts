@@ -1,5 +1,7 @@
 import ee2 = require('eventemitter2');
+import enums = require('./../../../minesweeper-common/domain/valueobject/enums');
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
+import ClientTile = require('./../../../minesweeper-common/domain/valueobject/clienttile');
 import iv = require('./../../../minesweeper-common/infrastructure/valueobject/interfaces');
 import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo');
 import ActivePlayers = require('./activeplayers');
@@ -26,15 +28,16 @@ class MineWorld {
         });
     }
 
-    move(coord: Coord) {
-        this.emitter.emit('move', cdxo.fromCoord(coord));
-    }
-
-    dig(coord: Coord) {
-        this.emitter.emit('dig', cdxo.fromCoord(coord));
-    }
-
-    flag(coord: Coord) {
-        this.emitter.emit('flag', cdxo.fromCoord(coord));
+    action(primary: boolean, coord: Coord) {
+        var tile: ClientTile = this.landform.getViewPoint(coord);
+        if (tile == null || tile.status !== enums.Status.CLOSE) {
+            this.emitter.emit('move', cdxo.fromCoord(coord));
+            return;
+        }
+        if (primary) {
+            this.emitter.emit('dig', cdxo.fromCoord(coord));
+        } else {
+            this.emitter.emit('flag', cdxo.fromCoord(coord));
+        }
     }
 }

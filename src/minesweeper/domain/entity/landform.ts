@@ -27,7 +27,7 @@ class Landform extends LandformBase {
     getViewPoint(coord: Coord): Tile {
         var tile = super.getViewPoint(coord);
         if (tile == null)
-            return Tile.Unknown;
+            return Tile.UNKNOWN;
         return tile;
     }
 
@@ -104,7 +104,7 @@ class Landform extends LandformBase {
         var clientTile = this.toClientTile(tile, coord);
         var players = this.players.get(Chunk.coordFromGlobal(coord));
         if (tile.landform === enums.Landform.BOMB) {
-            players.forEach(player => 
+            players.forEach(player =>
                 player.notifyExploded(coord)); // これだけでtileがopenでbombなことも伝わる
         } else {
             players.forEach(player =>
@@ -113,6 +113,12 @@ class Landform extends LandformBase {
     }
 
     flag(coord: Coord) {
+        var tile = this.getViewPoint(coord);
+        tile.layer = enums.Layer.FLAG;
+        var clientTile = this.toClientTile(tile, coord);
+        var players = this.players.get(Chunk.coordFromGlobal(coord));
+        players.forEach(player =>
+            player.notifyTile(coord, clientTile));
     }
 
     private toClientTile(tile: Tile, coord: Coord) {
@@ -120,8 +126,11 @@ class Landform extends LandformBase {
             return null;
         var around = this.getArounds(coord);
         return new ClientTile(
+            tile.status !== enums.Status.OPEN ? enums.Landform.UNKNOWN
+            : tile.landform,
             tile.status,
-            tile.landform === enums.Landform.BOMB ? 9
+            tile.layer,
+            tile.status !== enums.Status.OPEN ? -1
             : around.any(x => x.landform === enums.Landform.UNKNOWN) ? -1
             : around.count(x=> x.landform === enums.Landform.BOMB));
     }
@@ -147,7 +156,7 @@ class Landform extends LandformBase {
         } catch (error) {
             if (error.name !== ChunkNotFoundError.name)
                 throw error;
-            return Tile.Unknown;
+            return Tile.UNKNOWN;
         }
     }
 }
@@ -165,7 +174,8 @@ function createViewPointChunk(): Chunk<Tile> {
         for (var x = 0; x < 16; x++) {
             line.push(new Tile(
                 Math.random() < 0.25 ? enums.Landform.BOMB : enums.Landform.NONE,
-                enums.Status.CLOSE));
+                enums.Status.CLOSE,
+                enums.Layer.NONE));
         }
         chunk.push(line);
     }
@@ -192,7 +202,7 @@ class CoordMultiMap extends MultiMap<Coord, Player> {
 function createUnknownChunk(): Chunk<Tile> {
     return new Chunk(Enumerable.generate(() =>
         Enumerable.generate(() =>
-            new Tile(enums.Landform.UNKNOWN, enums.Status.UNKNOWN),
+            new Tile(enums.Landform.UNKNOWN, enums.Status.UNKNOWN, enums.Layer.UNKNOWN),
             16).toArray(),
         16).toArray());
 }

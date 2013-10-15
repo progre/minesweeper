@@ -60,13 +60,13 @@ class Player extends ee2.EventEmitter2 {
             super.emit('defect_chunk', cdxo.toCoord(coord));
         });
         this.defineEvent('move', (coord: ifs.ICoordDTO) => {
-            logger.info(coord);
+            this.beginMove(Intent.MOVING, cdxo.toCoord(coord));
         });
         this.defineEvent('dig', (coord: ifs.ICoordDTO) => {
             this.beginMove(Intent.DIGGING, cdxo.toCoord(coord));
         });
         this.defineEvent('flag', (coord: ifs.ICoordDTO) => {
-            logger.info(coord);
+            this.beginMove(Intent.FLAG, cdxo.toCoord(coord));
         });
 
         this.events.forEach(x => this.emitter.on(x.event, x.listener));
@@ -113,7 +113,8 @@ class Player extends ee2.EventEmitter2 {
         var coord = this.path.shift();
         if (!this.field.move(this, coord)) {
             if (intent === Intent.MOVING
-                || this.path.length > 0) {
+                || this.path.length > 0
+                || this.field.getViewPoint(coord).status !== enums.Status.CLOSE) {
                 this.path = [];
                 return;
             }

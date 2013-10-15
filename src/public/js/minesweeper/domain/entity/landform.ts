@@ -32,7 +32,11 @@ class Landform extends LandformBase {
         });
         emitter.on('exploded', (coordDTO: ifs.ICoordDTO) => {
             var coord = cdxo.toCoord(coordDTO);
-            this.putViewPoint(coord, new ClientTile(enums.Status.OPEN, 9));
+            this.putViewPoint(coord, new ClientTile(
+                enums.Landform.BOMB,
+                enums.Status.OPEN,
+                enums.Layer.NONE,
+                -1));
             this.emit('exploded', coord);
         });
     }

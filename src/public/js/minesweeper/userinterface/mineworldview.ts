@@ -36,15 +36,7 @@ class MineWorldView {
                 eventObj.stageX - (this.size.width >> 1),
                 eventObj.stageY - (this.size.height >> 1));
             var type = eventObj.nativeEvent.button;
-            if (false) {
-                mineWorld.move(coord);
-            }
-            if (type === 0) {
-                mineWorld.dig(coord);
-            }
-            if (type === 2) {
-                mineWorld.flag(coord);
-            }
+            mineWorld.action(type === 0, coord);
         });
 
         this.displayObject.addChild(this.clickObject);
