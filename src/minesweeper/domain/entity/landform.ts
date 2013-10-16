@@ -112,9 +112,9 @@ class Landform extends LandformBase {
         }
     }
 
-    flag(coord: Coord) {
+    setLayer(coord: Coord, layer: enums.Layer) {
         var tile = this.getViewPoint(coord);
-        tile.layer = enums.Layer.FLAG;
+        tile.layer = layer;
         var clientTile = this.toClientTile(tile, coord);
         var players = this.players.get(Chunk.coordFromGlobal(coord));
         players.forEach(player =>

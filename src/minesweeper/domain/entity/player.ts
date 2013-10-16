@@ -68,6 +68,12 @@ class Player extends ee2.EventEmitter2 {
         this.defineEvent('flag', (coord: ifs.ICoordDTO) => {
             this.beginMove(Intent.FLAG, cdxo.toCoord(coord));
         });
+        this.defineEvent('question', (coord: ifs.ICoordDTO) => {
+            this.beginMove(Intent.QUESTION, cdxo.toCoord(coord));
+        });
+        this.defineEvent('remove_question', (coord: ifs.ICoordDTO) => {
+            this.beginMove(Intent.REMOVE_QUESTION, cdxo.toCoord(coord));
+        });
 
         this.events.forEach(x => this.emitter.on(x.event, x.listener));
     }
@@ -119,8 +125,18 @@ class Player extends ee2.EventEmitter2 {
                 return;
             }
             switch (intent) {
-                case Intent.FLAG: this.field.flag(coord); return;
-                case Intent.DIGGING: this.field.dig(coord); return;
+                case Intent.FLAG:
+                    this.field.setLayer(coord, enums.Layer.FLAG);
+                    return;
+                case Intent.QUESTION:
+                    this.field.setLayer(coord, enums.Layer.QUESTION);
+                    return;
+                case Intent.REMOVE_QUESTION:
+                    this.field.setLayer(coord, enums.Layer.NONE);
+                    return;
+                case Intent.DIGGING:
+                    this.field.dig(coord);
+                    return;
             }
         }
         super.emit('moved', this.coord);
@@ -132,5 +148,5 @@ class Player extends ee2.EventEmitter2 {
 }
 
 enum Intent {
-    MOVING, DIGGING, FLAG
+    MOVING, DIGGING, FLAG, QUESTION, REMOVE_QUESTION
 }

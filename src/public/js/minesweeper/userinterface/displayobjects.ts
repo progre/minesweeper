@@ -18,7 +18,7 @@ export function createHighLayerTemplate(loadQueue: createjs.LoadQueue) {
         images: [loadQueue.getResult('/img/numbers.png'), loadQueue.getResult('/img/layers.png')],
         frames: { width: 32, height: 32 },
         animations: {
-            'unknown': [14],
+            'unknown': [11],
             '1': [0],
             '2': [1],
             '3': [2],

@@ -37,7 +37,17 @@ class MineWorld {
         if (primary) {
             this.emitter.emit('dig', cdxo.fromCoord(coord));
         } else {
-            this.emitter.emit('flag', cdxo.fromCoord(coord));
+            switch (tile.layer) {
+                case enums.Layer.NONE:
+                    this.emitter.emit('flag', cdxo.fromCoord(coord));
+                    break;
+                case enums.Layer.FLAG:
+                    this.emitter.emit('question', cdxo.fromCoord(coord));
+                    break;
+                case enums.Layer.QUESTION:
+                    this.emitter.emit('remove_question', cdxo.fromCoord(coord));
+                    break;
+            }
         }
     }
 }

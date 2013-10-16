@@ -75,7 +75,7 @@ class TileView {
                     return;
                 }
                 if (0 < mines && mines <= 8) {
-                    this.highLayer.gotoAndStop(mines.toString());
+                    this.highLayer.gotoAndStop((mines - 1).toString());
                     this.highLayer.visible = true;
                     this.lowLayer.visible = false;
                     return;
