@@ -5,6 +5,6 @@
 /// <reference path='../../DefinitelyTyped/eventemitter2-module.d.ts'/>
 
 import game = require('./framework/game');
-import GameScene = require('./minesweeper/userinterface/gamescene');
+import GameScene = require('./minesweeper-client/userinterface/gamescene');
 
 new game.Game(window, GameScene.resourceFiles, loadQueue => new GameScene(loadQueue), -1).run();
