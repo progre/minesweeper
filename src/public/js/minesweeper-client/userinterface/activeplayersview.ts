@@ -13,7 +13,7 @@ class PlayerView {
         '/img/hiyoco_waru_full.png'
     ];
 
-    displayObject: createjs.BitmapAnimation;
+    displayObject: createjs.Sprite;
 
     constructor(private loadQueue: createjs.LoadQueue, private model: ifs.IPlayer, private camera: Camera) {
         this.displayObject = this.getCharactor(model.image);
@@ -36,7 +36,7 @@ class PlayerView {
             images: [],
             frames: { width: 32, height: 32 },
             animations: {
-                'walk': { frames: [], frequency: 6 }
+                'walk': { frames: [], speed: 1 / 6 }
             }
         };
         if (name === 'remilia') {
@@ -47,7 +47,7 @@ class PlayerView {
             ssOpt.animations['walk'].frames = [6, 7, 8, 7];
         }
         var ss = new createjs.SpriteSheet(ssOpt);
-        return new createjs.BitmapAnimation(ss);
+        return new createjs.Sprite(ss);
     }
 }
 
@@ -67,11 +67,11 @@ function getHiyoko() {
         images: [this.loadQueue.getResult('/img/hiyoco_nomal_full.png')],
         frames: { width: 32, height: 32 },
         animations: {
-            'walk': { frames: [0, 1, 2, 1], frequency: 6 }
+            'walk': { frames: [0, 1, 2, 1], speed: 1 / 6 }
         }
     };
     var ss = new createjs.SpriteSheet(ssOpt);
-    return new createjs.BitmapAnimation(ss);
+    return new createjs.Sprite(ss);
 }
 
 export = ActivePlayersView;
@@ -83,6 +83,8 @@ class ActivePlayersView {
     private center: Coord;
 
     constructor(private loadQueue: createjs.LoadQueue, private camera: Camera, private activePlayers: ActivePlayers) {
+        this.displayObject.mouseEnabled = false;
+
         activePlayers.on('player_moved', (obj: { id: number; coord: Coord }) => {
             this.items[obj.id].updatePosition();
         });

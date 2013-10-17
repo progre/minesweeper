@@ -4,9 +4,9 @@ import ClientTile = require('./../../minesweeper-common/domain/valueobject/clien
 export = TileView;
 class TileView {
     constructor(
-        public base: createjs.BitmapAnimation,
-        public lowLayer: createjs.BitmapAnimation,
-        public highLayer: createjs.BitmapAnimation) {
+        public base: createjs.Sprite,
+        public lowLayer: createjs.Sprite,
+        public highLayer: createjs.Sprite) {
     }
 
     setPos(x: number, y: number) {

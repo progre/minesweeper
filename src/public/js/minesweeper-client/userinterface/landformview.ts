@@ -14,15 +14,17 @@ class LandformView {
     frontDisplayObject = new createjs.Container();
     layer = new createjs.Container();
     cachelessLayer = new createjs.Container();
-    private baseTemplate: createjs.BitmapAnimation;
-    private lowLayerTemplate: createjs.BitmapAnimation;
-    private highLayerTemplate: createjs.BitmapAnimation;
-    private explosionTemplate: createjs.BitmapAnimation;
+    private baseTemplate: createjs.Sprite;
+    private lowLayerTemplate: createjs.Sprite;
+    private highLayerTemplate: createjs.Sprite;
+    private explosionTemplate: createjs.Sprite;
     private tiles: TileView[][] = [[]];
     /** Œ»Ý‚Ì•`‰æ—Ìˆæ */
     private rect: game.Rect;
 
     constructor(private loadQueue: createjs.LoadQueue, private landform: Landform, private camera: Camera) {
+        this.backDisplayObject.mouseEnabled = false;
+        this.frontDisplayObject.mouseEnabled = false;
         this.baseTemplate = dos.createBaseTemplate(loadQueue);
         this.lowLayerTemplate = dos.createLowLayerTemplate(loadQueue);
         this.highLayerTemplate = dos.createHighLayerTemplate(loadQueue);
@@ -41,7 +43,7 @@ class LandformView {
             var absCoord = this.camera.fromAbsoluteToDisplay(coord);
             exp.x = absCoord.x + 8 - 108;
             exp.y = absCoord.y + 8 - 108;
-            exp.onAnimationEnd = () => this.cachelessLayer.removeChild(exp);
+            exp.on('animationend', () => this.cachelessLayer.removeChild(exp));
         });
     }
 

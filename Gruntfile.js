@@ -114,7 +114,7 @@ module.exports = function(grunt) {
           var dependencies = [
             'node',
             'express',
-            'easeljs',
+            //'easeljs',
             'tweenjs',
             'preloadjs'
           ];

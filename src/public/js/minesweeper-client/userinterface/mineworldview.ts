@@ -54,7 +54,7 @@ class MineWorldView {
 
 function createWall() {
     var wall = new createjs.Shape();
-    wall.graphics.beginFill('#000').drawRect(0, 0, 65535, 65535);
+    wall.graphics.beginFill('#0000').drawRect(0, 0, 65535, 65535);
     wall.x = -65535 / 2;
     wall.y = -65535 / 2;
     return wall;

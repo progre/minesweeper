@@ -66,4 +66,4 @@ export function createExplosionTemplate(loadQueue: createjs.LoadQueue) {
 }
 
 var createAnim = (ssOpt: any)
-    => new createjs.BitmapAnimation(new createjs.SpriteSheet(ssOpt));
+    => new createjs.Sprite(new createjs.SpriteSheet(ssOpt));

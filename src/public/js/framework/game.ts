@@ -38,7 +38,7 @@ export class Game {
         this.window.addEventListener('resize', () => this.setSize(canvas, stage, presenterObj));
 
         createjs.Ticker.setFPS(60);
-        createjs.Ticker.addListener(() => {
+        createjs.Ticker.addEventListener('tick', () => {
             presenterObj.update();
             stage.update();
         });

@@ -1,4 +1,4 @@
-/// <reference path='../../DefinitelyTyped/easeljs/easeljs.d.ts'/>
+/// <reference path='../../DefinitelyTyped/easeljs.d.ts'/>
 /// <reference path='../../DefinitelyTyped/preloadjs/preloadjs.d.ts'/>
 /// <reference path='../../DefinitelyTyped/linq.d.ts'/>
 /// <reference path='../../DefinitelyTyped/jsbn.d.ts'/>
