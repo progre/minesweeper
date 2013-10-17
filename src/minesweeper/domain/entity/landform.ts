@@ -2,6 +2,7 @@ var log4js = require('log4js');
 import Enumerable = require('./../../../lib/linq');
 import LandformBase = require('./../../../minesweeper-common/domain/entity/landformbase');
 import ChunkNotFoundError = require('./../../../minesweeper-common/domain/entity/chunknotfounderror');
+import PathFinder = require('./../../../minesweeper-common/domain/entity/pathfinder');
 import Chunk = require('./../../../minesweeper-common/domain/entity/chunk');
 import enums = require('./../../../minesweeper-common/domain/valueobject/enums');
 import Tile = require('./../../../minesweeper-common/domain/valueobject/tile');
@@ -9,7 +10,6 @@ import ClientTile = require('./../../../minesweeper-common/domain/valueobject/cl
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
 import MultiMap = require('./multimap');
 import Player = require('./player');
-import PathFinder = require('./pathfinder');
 
 var logger = log4js.getLogger();
 
@@ -95,7 +95,7 @@ class Landform extends LandformBase {
     }
 
     isMovable(coord: Coord) {
-        return isMovable(this.getViewPoint(coord));
+        return this.getViewPoint(coord).isMovable();
     }
 
     dig(coord: Coord) {
