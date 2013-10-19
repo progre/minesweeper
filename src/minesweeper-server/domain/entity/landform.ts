@@ -100,6 +100,9 @@ class Landform extends LandformBase {
 
     dig(coord: Coord) {
         var tile = this.getViewPoint(coord);
+        if (tile.status !== enums.Status.CLOSE
+            || tile.layer !== enums.Layer.NONE)
+            return;
         tile.status = enums.Status.OPEN;
         var clientTile = this.toClientTile(tile, coord);
         var players = this.players.get(Chunk.coordFromGlobal(coord));

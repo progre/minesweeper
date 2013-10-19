@@ -16,6 +16,12 @@ class MineWorld {
     constructor(
         /** プレイヤー全体に通知するemitter */
         private emitter: EventEmitter) {
+
+        // スタート地点のChunkは最初に作っておく
+        this.landform.getViewPointChunk(Coord.fromNumber(-1, -1));
+        this.landform.getViewPointChunk(Coord.fromNumber(0, -1));
+        this.landform.getViewPointChunk(Coord.fromNumber(-1, 0));
+        this.landform.getViewPointChunk(Coord.fromNumber(0, 0));
     }
 
     /** プレイヤーを作ってリポジトリに保存する */
