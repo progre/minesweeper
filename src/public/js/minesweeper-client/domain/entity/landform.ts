@@ -22,9 +22,9 @@ class Landform extends LandformBase {
                 cdxo.toCoord(obj.coord),
                 new Chunk<any>(obj.chunk));// HACK: Chunk<ClientTile>とすべき
         });
-        emitter.on('view_point', (obj: { coord: ifs.ICoordDTO; viewPoint: ClientTile }) => {
-            console.log('viewPoint' + cdxo.toCoord(obj.coord).toString() + 'を受信しました');
-            this.putTile(cdxo.toCoord(obj.coord), obj.viewPoint);
+        emitter.on('tile', (obj: { coord: ifs.ICoordDTO; tile: ClientTile }) => {
+            console.log('tile' + cdxo.toCoord(obj.coord).toString() + 'を受信しました');
+            this.putTile(cdxo.toCoord(obj.coord), obj.tile);
         });
         emitter.on('opened', () => {
         });

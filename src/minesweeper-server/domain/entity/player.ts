@@ -95,7 +95,7 @@ class Player extends ee2.EventEmitter2 {
     }
 
     notifyTile(coord: Coord, tile: ClientTile) {
-        this.emitter.emit('view_point', { coord: cdxo.fromCoord(coord), viewPoint: tile });
+        this.emitter.emit('tile', { coord: cdxo.fromCoord(coord), tile: tile });
     }
 
     notifyExploded(coord: Coord) {
