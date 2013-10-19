@@ -24,8 +24,8 @@ class Landform extends LandformBase {
     }
 
     /** @override */
-    getViewPoint(coord: Coord): Tile {
-        var tile = super.getViewPoint(coord);
+    getTile(coord: Coord): Tile {
+        var tile = super.getTile(coord);
         if (tile == null)
             return Tile.UNKNOWN;
         return tile;
@@ -34,7 +34,7 @@ class Landform extends LandformBase {
     join(coord: Coord, player: Player) {
         logger.debug('player join to: ' + coord.toString());
         this.players.put(coord, player);
-        var chunk = this.getClientViewPointChunk(coord);
+        var chunk = this.getClientTileChunk(coord);
         if (chunk == null)
             return;
         player.notifyChunk(coord, chunk);
@@ -52,11 +52,11 @@ class Landform extends LandformBase {
 
     /** override */
     /** @protected */
-    requestViewPointChunk(coord: Coord) {
+    requestTileChunk(coord: Coord) {
         // DBに取りに行ったり
         (callback => callback(null))((chunk: Chunk<Tile>) => {
             if (chunk == null) {
-                chunk = createViewPointChunk();
+                chunk = createTileChunk();
                 if (coord.equals(Coord.fromNumber(-1, -1))) {
                     setEmpty(chunk, 13, 13, 16, 16);
                 }
@@ -71,7 +71,7 @@ class Landform extends LandformBase {
                 }
                 // DBに書き込む？
             }
-            this.viewPointChunks.putByCoord(coord, chunk);
+            this.tileChunks.putByCoord(coord, chunk);
             var clientChunk = this.toClientChunk(chunk, coord);
             this.players.get(coord).forEach(player => {
                 player.notifyChunk(coord, clientChunk);
@@ -79,8 +79,8 @@ class Landform extends LandformBase {
         });
     }
 
-    getClientViewPointChunk(coord: Coord): Chunk<ClientTile> {
-        var chunk = this.getViewPointChunk(coord);
+    getClientTileChunk(coord: Coord): Chunk<ClientTile> {
+        var chunk = this.getTileChunk(coord);
         if (chunk == null) {
             return null;
         }
@@ -95,11 +95,11 @@ class Landform extends LandformBase {
     }
 
     isMovable(coord: Coord) {
-        return this.getViewPoint(coord).isMovable();
+        return this.getTile(coord).isMovable();
     }
 
     dig(coord: Coord) {
-        var tile = this.getViewPoint(coord);
+        var tile = this.getTile(coord);
         if (tile.status !== enums.Status.CLOSE
             || tile.layer !== enums.Layer.NONE)
             return;
@@ -116,7 +116,7 @@ class Landform extends LandformBase {
     }
 
     setLayer(coord: Coord, layer: enums.Layer) {
-        var tile = this.getViewPoint(coord);
+        var tile = this.getTile(coord);
         tile.layer = layer;
         var clientTile = this.toClientTile(tile, coord);
         var players = this.players.get(Chunk.coordFromGlobal(coord));
@@ -150,12 +150,12 @@ class Landform extends LandformBase {
 
     private getArounds(coord: Coord) {
         return Enumerable.from(coord.getArounds())
-            .select(x => this.getViewPointWithoutRequest(x));
+            .select(x => this.getTileWithoutRequest(x));
     }
 
-    private getViewPointWithoutRequest(coord: Coord) {
+    private getTileWithoutRequest(coord: Coord) {
         try {
-            return this.viewPointChunks.getShred(coord);
+            return this.tileChunks.getShred(coord);
         } catch (error) {
             if (error.name !== ChunkNotFoundError.name)
                 throw error;
@@ -164,13 +164,13 @@ class Landform extends LandformBase {
     }
 }
 
-function isMovable(viewPoint: Tile) {
-    return viewPoint.status === enums.Status.OPEN
-        && viewPoint.landform === enums.Landform.NONE;
+function isMovable(tile: Tile) {
+    return tile.status === enums.Status.OPEN
+        && tile.landform === enums.Landform.NONE;
 }
 
 /** 16x16の地形を作成する */
-function createViewPointChunk(): Chunk<Tile> {
+function createTileChunk(): Chunk<Tile> {
     var chunk: Tile[][] = [];
     for (var y = 0; y < 16; y++) {
         var line = [];
@@ -188,9 +188,9 @@ function createViewPointChunk(): Chunk<Tile> {
 function setEmpty(chunk: Chunk<Tile>, xBegin: number, yBegin: number, xEnd: number, yEnd: number) {
     for (var y = yBegin; y < yEnd; y++) {
         for (var x = xBegin; x < xEnd; x++) {
-            var viewPoint = chunk.get(x, y);
-            viewPoint.status = enums.Status.OPEN;
-            viewPoint.landform = enums.Landform.NONE;
+            var tile = chunk.get(x, y);
+            tile.status = enums.Status.OPEN;
+            tile.landform = enums.Landform.NONE;
         }
     }
 }

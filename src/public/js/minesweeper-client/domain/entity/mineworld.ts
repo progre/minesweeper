@@ -29,7 +29,7 @@ class MineWorld {
     }
 
     action(primary: boolean, coord: Coord) {
-        var tile: ClientTile = this.landform.getViewPoint(coord);
+        var tile: ClientTile = this.landform.getTile(coord);
         if (tile == null || tile.status !== enums.Status.CLOSE) {
             this.emitter.emit('move', cdxo.fromCoord(coord));
             return;

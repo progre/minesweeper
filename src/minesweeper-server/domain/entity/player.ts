@@ -94,8 +94,8 @@ class Player extends ee2.EventEmitter2 {
         this.emitter.emit('chunk', { coord: cdxo.fromCoord(coord), chunk: chunk.items });
     }
 
-    notifyTile(coord: Coord, viewPoint: ClientTile) {
-        this.emitter.emit('view_point', { coord: cdxo.fromCoord(coord), viewPoint: viewPoint });
+    notifyTile(coord: Coord, tile: ClientTile) {
+        this.emitter.emit('view_point', { coord: cdxo.fromCoord(coord), viewPoint: tile });
     }
 
     notifyExploded(coord: Coord) {
@@ -120,7 +120,7 @@ class Player extends ee2.EventEmitter2 {
         if (!this.field.move(this, coord)) {
             if (intent === Intent.MOVING
                 || this.path.length > 0
-                || this.field.getViewPoint(coord).status !== enums.Status.CLOSE) {
+                || this.field.getTile(coord).status !== enums.Status.CLOSE) {
                 this.path = [];
                 return;
             }

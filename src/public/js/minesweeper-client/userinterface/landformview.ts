@@ -97,7 +97,7 @@ class LandformView {
             for (var col = 0; col < cols; col++) {
                 var tile = this.tiles[row][col];
                 tile.setPos(left + col * 32, top + row * 32);
-                var model: ClientTile = this.landform.getViewPoint(
+                var model: ClientTile = this.landform.getTile(
                     this.camera.fromRelativeToAbsolute(
                         col - colCenter,
                         row - rowCenter));

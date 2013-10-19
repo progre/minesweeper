@@ -18,13 +18,13 @@ class Landform extends LandformBase {
         emitter.on('chunk', (obj: { coord: ifs.ICoordDTO; chunk: ClientTile[][] }) => {
             console.log('Chunk' + cdxo.toCoord(obj.coord).toString() + 'を受信しました');
             delete this.joinRequests[obj.coord.toString()];
-            this.putViewPointChunk(
+            this.putTileChunk(
                 cdxo.toCoord(obj.coord),
                 new Chunk<any>(obj.chunk));// HACK: Chunk<ClientTile>とすべき
         });
         emitter.on('view_point', (obj: { coord: ifs.ICoordDTO; viewPoint: ClientTile }) => {
             console.log('viewPoint' + cdxo.toCoord(obj.coord).toString() + 'を受信しました');
-            this.putViewPoint(cdxo.toCoord(obj.coord), obj.viewPoint);
+            this.putTile(cdxo.toCoord(obj.coord), obj.viewPoint);
         });
         emitter.on('opened', () => {
         });
@@ -32,7 +32,7 @@ class Landform extends LandformBase {
         });
         emitter.on('exploded', (coordDTO: ifs.ICoordDTO) => {
             var coord = cdxo.toCoord(coordDTO);
-            this.putViewPoint(coord, new ClientTile(
+            this.putTile(coord, new ClientTile(
                 enums.Landform.BOMB,
                 enums.Status.OPEN,
                 enums.Layer.NONE,
@@ -43,7 +43,7 @@ class Landform extends LandformBase {
 
     /** @override */
     /** @protected */
-    requestViewPointChunk(coord: Coord): void {
+    requestTileChunk(coord: Coord): void {
         if (this.emitter == null)
             return;
         var req = this.joinRequests[coord.toString()];
