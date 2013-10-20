@@ -122,9 +122,11 @@ class Landform extends LandformBase {
                 player.notifyTile(coord, clientTile));
         }
         if (clientTile.mines === 0) {
-            beginForEach(coord.getArounds(), around => {
-                this.dig(around);
-            }, 1);
+            beginForEach(
+                Enumerable.from(coord.getArounds()).shuffle().toArray(),
+                around => {
+                    this.dig(around);
+                }, 10);
         }
     }
 
