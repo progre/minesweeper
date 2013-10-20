@@ -87,6 +87,14 @@ class Landform extends LandformBase {
         return this.toClientChunk(chunk, coord);
     }
 
+    getClientTile(coord: Coord): ClientTile {
+        var chunk = this.getTile(coord);
+        if (chunk == null) {
+            return null;
+        }
+        return this.toClientTile(chunk, coord);
+    }
+
     move(player: Player, to: Coord) {
         if (!this.isMovable(to))
             return false;
@@ -112,6 +120,11 @@ class Landform extends LandformBase {
         } else {
             players.forEach(player =>
                 player.notifyTile(coord, clientTile));
+        }
+        if (clientTile.mines === 0) {
+            beginForEach(coord.getArounds(), around => {
+                this.dig(around);
+            }, 1);
         }
     }
 
@@ -208,6 +221,15 @@ function createUnknownChunk(): Chunk<Tile> {
             new Tile(enums.Landform.UNKNOWN, enums.Status.UNKNOWN, enums.Layer.UNKNOWN),
             16).toArray(),
         16).toArray());
+}
+
+function beginForEach(list: any[], callback: (obj: any) => void, timeout?: any) {
+    setTimeout(() => {
+        callback(list.shift());
+        if (list.length === 0)
+            return;
+        beginForEach(list, callback, timeout);
+    }, timeout);
 }
 
 var __scope: MultiMap<any, any> = new MultiMap<any, any>();// MultiMapのimportが消えるためやむなく
