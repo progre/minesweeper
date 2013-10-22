@@ -116,7 +116,8 @@ module.exports = function(grunt) {
             'express',
             //'easeljs',
             'tweenjs',
-            'preloadjs'
+            'preloadjs',
+            'socket.io'
           ];
           return 'tsd install ' + dependencies.join(' ');
         }

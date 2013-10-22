@@ -36,7 +36,7 @@ class MineWorldView {
                 eventObj.stageX - (this.size.width >> 1),
                 eventObj.stageY - (this.size.height >> 1));
             var type = eventObj.nativeEvent.button;
-            mineWorld.action(type === 0, coord);
+            mineWorld.activePlayers.getCentralPlayer().action(type === 0, coord);
         });
 
         this.displayObject.addChild(this.clickObject);

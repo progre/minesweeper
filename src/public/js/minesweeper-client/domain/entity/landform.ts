@@ -1,6 +1,7 @@
 import ee2 = require('eventemitter2');
 import Enumerable = require('./../../../lib/linq');
 import LandformBase = require('./../../../minesweeper-common/domain/entity/landformbase');
+import PathFinder = require('./../../../minesweeper-common/domain/entity/pathfinder');
 import Chunk = require('./../../../minesweeper-common/domain/entity/chunk');
 import enums = require('./../../../minesweeper-common/domain/valueobject/enums');
 import ClientTile = require('./../../../minesweeper-common/domain/valueobject/clienttile');
@@ -10,10 +11,11 @@ import ifs = require('./../../../minesweeper-common/infrastructure/valueobject/i
 
 export = Landform;
 class Landform extends LandformBase {
-    private emitter: ee2.EventEmitter2;
+    pathFinder = new PathFinder(this);
+    private emitter: Socket;
     private joinRequests: { [coord: string]: Date } = {};
 
-    setEmitter(emitter: ee2.EventEmitter2) {
+    setEmitter(emitter: Socket) {
         this.emitter = emitter;
         emitter.on('chunk', (obj: { coord: ifs.ICoordDTO; chunk: ClientTile[][] }) => {
             console.log('Chunk' + cdxo.toCoord(obj.coord).toString() + 'を受信しました');
@@ -39,6 +41,13 @@ class Landform extends LandformBase {
                 -1));
             this.emit('exploded', coord);
         });
+    }
+
+    isMovable(coord: Coord) {
+        var tile: ClientTile = this.getTile(coord);
+        return tile != null
+            && tile.status === enums.Status.OPEN
+            && tile.landform === enums.Landform.NONE;
     }
 
     /** @override */

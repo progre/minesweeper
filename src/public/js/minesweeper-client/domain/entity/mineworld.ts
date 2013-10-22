@@ -3,7 +3,7 @@ import enums = require('./../../../minesweeper-common/domain/valueobject/enums')
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
 import ClientTile = require('./../../../minesweeper-common/domain/valueobject/clienttile');
 import iv = require('./../../../minesweeper-common/infrastructure/valueobject/interfaces');
-import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo');
+import dxo = require('./../../infrastructure/dxo');
 import ActivePlayers = require('./activeplayers');
 import Landform = require('./landform');
 
@@ -13,41 +13,18 @@ class MineWorld {
     landform = new Landform();
     /** infrastructure */
     /** イベント受信用 */
-    private emitter: ee2.EventEmitter2;
+    private emitter: Socket;
 
-    setEmitter(emitter: ee2.EventEmitter2) {
+    setEmitter(emitter: Socket) {
         this.emitter = emitter;
         this.activePlayers.setEmitter(emitter);
         this.landform.setEmitter(emitter);
 
         emitter.on('full_data', (dto: iv.IFullDataDTO) => {
-            var model = cdxo.toMineWorld(dto);
+            var model = dxo.toMineWorld(dto, this.landform);
             console.log('プレイヤー' + Enumerable.from(model.players).count() + '人が参加中');
-            this.activePlayers.setPlayers(model.players);
+            this.activePlayers.setPlayers(model.players, this.landform);
             this.activePlayers.setCentralPlayer(model.yourId);
         });
-    }
-
-    action(primary: boolean, coord: Coord) {
-        var tile: ClientTile = this.landform.getTile(coord);
-        if (tile == null || tile.status !== enums.Status.CLOSE) {
-            this.emitter.emit('move', cdxo.fromCoord(coord));
-            return;
-        }
-        if (primary) {
-            this.emitter.emit('dig', cdxo.fromCoord(coord));
-        } else {
-            switch (tile.layer) {
-                case enums.Layer.NONE:
-                    this.emitter.emit('flag', cdxo.fromCoord(coord));
-                    break;
-                case enums.Layer.FLAG:
-                    this.emitter.emit('question', cdxo.fromCoord(coord));
-                    break;
-                case enums.Layer.QUESTION:
-                    this.emitter.emit('remove_question', cdxo.fromCoord(coord));
-                    break;
-            }
-        }
     }
 }
