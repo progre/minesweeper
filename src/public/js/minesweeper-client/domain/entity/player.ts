@@ -1,12 +1,12 @@
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
 import ClientTile = require('./../../../minesweeper-common/domain/valueobject/clienttile');
 import enums = require('./../../../minesweeper-common/domain/valueobject/enums');
-import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo');
 import Landform = require('./landform');
+import ClientSocket = require('./clientsocket');
 
 export = Player;
 class Player {
-    private emitter: Socket;
+    private socket: ClientSocket;
     private field: Landform;
 
     constructor(
@@ -14,8 +14,8 @@ class Player {
         public image: string) {
     }
 
-    setEmitter(emitter: Socket) {
-        this.emitter = emitter;
+    setSocket(socket: ClientSocket) {
+        this.socket = socket;
     }
 
     setField(field: Landform) {
@@ -31,22 +31,22 @@ class Player {
 
         var tile: ClientTile = this.field.getTile(coord);
         if (tile == null || tile.status !== enums.Status.CLOSE) {
-            this.emitter.emit('move', cdxo.fromCoord(coord));
+            this.socket.move(coord);
             return;
         }
         if (primary) {
-            this.emitter.emit('dig', cdxo.fromCoord(coord));
+            this.socket.dig(coord);
             return;
         }
         switch (tile.layer) {
             case enums.Layer.NONE:
-                this.emitter.emit('flag', cdxo.fromCoord(coord));
+                this.socket.flag(coord);
                 break;
             case enums.Layer.FLAG:
-                this.emitter.emit('question', cdxo.fromCoord(coord));
+                this.socket.question(coord);
                 break;
             case enums.Layer.QUESTION:
-                this.emitter.emit('remove_question', cdxo.fromCoord(coord));
+                this.socket.removeQuestion(coord);
                 break;
         }
     }

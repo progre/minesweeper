@@ -9,7 +9,7 @@ import Player = require('./player');
 
 export = ClientSocket;
 class ClientSocket {
-    public socket: Socket;
+    private socket: Socket;
 
     connect(callback: () => void) {
         this.socket = server.connect();
@@ -67,6 +67,26 @@ class ClientSocket {
 
     joinChunk(coord: Coord) {
         this.socket.emit('join_chunk', cdxo.fromCoord(coord));
+    }
+
+    move(coord: Coord) {
+        this.socket.emit('move', cdxo.fromCoord(coord));
+    }
+
+    dig(coord: Coord) {
+        this.socket.emit('dig', cdxo.fromCoord(coord));
+    }
+
+    flag(coord: Coord) {
+        this.socket.emit('flag', cdxo.fromCoord(coord));
+    }
+
+    question(coord: Coord) {
+        this.socket.emit('question', cdxo.fromCoord(coord));
+    }
+
+    removeQuestion(coord: Coord) {
+        this.socket.emit('remove_question', cdxo.fromCoord(coord));
     }
 }
 

@@ -33,8 +33,7 @@ class ActivePlayers extends ee2.EventEmitter2 {
             this.items[obj.id] = obj.player;
             super.emit('player_added', obj);
             if (obj.id === this.centralPlayer) {
-                this.get(this.centralPlayer).setEmitter(this.socket.socket);
-                super.emit('central_player_selected', obj.id);
+                this.selectCentralPlayer();
             }
         });
         this.socket.onPlayerDeactivated(obj => {
@@ -47,8 +46,7 @@ class ActivePlayers extends ee2.EventEmitter2 {
     setCentralPlayer(id: number) {
         this.centralPlayer = id;
         if (this.get(id) != null) {
-            this.get(id).setEmitter(this.socket.socket);
-            super.emit('central_player_selected', id);
+            this.selectCentralPlayer();
         }
     }
 
@@ -58,5 +56,10 @@ class ActivePlayers extends ee2.EventEmitter2 {
 
     count() {
         return Enumerable.from(this.items).count();
+    }
+
+    private selectCentralPlayer() {
+        this.getCentralPlayer().setSocket(this.socket);
+        super.emit('central_player_selected', this.centralPlayer);
     }
 }
