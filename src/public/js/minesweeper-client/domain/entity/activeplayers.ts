@@ -1,23 +1,21 @@
 import ee2 = require('eventemitter2');
-import iv = require('./../../../minesweeper-common/infrastructure/valueobject/interfaces');
-import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo');
 import cifs = require('./../../../minesweeper-common/domain/entity/interfaces');
-import dxo = require('./../../infrastructure/dxo');
 import Player = require('./player');
 import Landform = require('./landform');
+import ClientSocket = require('./clientsocket');
 
 export = ActivePlayers;
 class ActivePlayers extends ee2.EventEmitter2 {
     private centralPlayer: number;
     private items: cifs.IHash<Player> = null;
-    private emitter: Socket;
+    private socket: ClientSocket;
 
     get(id: number): Player {
         return this.items[id];
     }
 
-    setEmitter(emitter: Socket) {
-        this.emitter = emitter;
+    setSocket(socket: ClientSocket) {
+        this.socket = socket;
     }
 
     setPlayers(items: cifs.IHash<Player>, field: Landform) {
@@ -26,21 +24,20 @@ class ActivePlayers extends ee2.EventEmitter2 {
             items[parseInt(id)].setField(field);
             super.emit('player_added', { id: id, player: items[id] });
         });
-        this.emitter.on('moved', (obj: iv.IMoveDTO) => {
-            this.items[obj.id].coord = cdxo.toCoord(obj.coord);
-            super.emit('player_moved', { id: obj.id, coord: this.items[obj.id].coord });
+        this.socket.onMoved(obj => {
+            this.items[obj.id].coord = obj.coord;
+            super.emit('player_moved', obj);
         });
-        this.emitter.on('player_activated', (obj: { id: number; player: iv.IPlayerDTO }) => {
-            var player = dxo.toPlayer(obj.player);
-            player.setField(field);
-            this.items[obj.id] = player;
-            super.emit('player_added', { id: obj.id, player: player });
+        this.socket.onPlayerActivated(obj => {
+            obj.player.setField(field);
+            this.items[obj.id] = obj.player;
+            super.emit('player_added', obj);
             if (obj.id === this.centralPlayer) {
-                this.get(this.centralPlayer).setEmitter(this.emitter);
+                this.get(this.centralPlayer).setEmitter(this.socket.socket);
                 super.emit('central_player_selected', obj.id);
             }
         });
-        this.emitter.on('player_deactivated', (obj: { id: number; player: iv.IPlayerDTO }) => {
+        this.socket.onPlayerDeactivated(obj => {
             var player = this.items[obj.id];
             delete this.items[obj.id];
             super.emit('player_removed', obj.id);
@@ -50,7 +47,7 @@ class ActivePlayers extends ee2.EventEmitter2 {
     setCentralPlayer(id: number) {
         this.centralPlayer = id;
         if (this.get(id) != null) {
-            this.get(id).setEmitter(this.emitter);
+            this.get(id).setEmitter(this.socket.socket);
             super.emit('central_player_selected', id);
         }
     }

@@ -14,8 +14,8 @@ class GameMain {
         socket.connect(() => {
             console.log('接続しました');
 
-            this.activePlayers.setEmitter(socket.socket);
-            this.landform.setEmitter(socket.socket);
+            this.activePlayers.setSocket(socket);
+            this.landform.setSocket(socket);
             socket.onFullData(obj => {
                 console.log('プレイヤー' + Enumerable.from(obj.activePlayers).count() + '人が参加中');
                 this.activePlayers.setPlayers(obj.activePlayers, this.landform);

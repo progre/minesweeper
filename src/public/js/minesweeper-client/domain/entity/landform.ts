@@ -6,34 +6,26 @@ import Chunk = require('./../../../minesweeper-common/domain/entity/chunk');
 import enums = require('./../../../minesweeper-common/domain/valueobject/enums');
 import ClientTile = require('./../../../minesweeper-common/domain/valueobject/clienttile');
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
-import cdxo = require('./../../../minesweeper-common/infrastructure/service/dxo');
-import ifs = require('./../../../minesweeper-common/infrastructure/valueobject/interfaces');
+import ClientSocket = require('./clientsocket');
 
 export = Landform;
 class Landform extends LandformBase {
     pathFinder = new PathFinder(this);
-    private emitter: Socket;
+    private socket: ClientSocket;
     private joinRequests: { [coord: string]: Date } = {};
 
-    setEmitter(emitter: Socket) {
-        this.emitter = emitter;
-        emitter.on('chunk', (obj: { coord: ifs.ICoordDTO; chunk: ClientTile[][] }) => {
-            console.log('Chunk' + cdxo.toCoord(obj.coord).toString() + 'を受信しました');
+    setSocket(socket: ClientSocket) {
+        this.socket = socket;
+        socket.onChunk(obj => {
+            console.log('Chunk' + obj.coord.toString() + 'を受信しました');
             delete this.joinRequests[obj.coord.toString()];
-            this.putTileChunk(
-                cdxo.toCoord(obj.coord),
-                new Chunk<any>(obj.chunk));// HACK: Chunk<ClientTile>とすべき
+            this.putTileChunk(obj.coord, obj.chunk);
         });
-        emitter.on('tile', (obj: { coord: ifs.ICoordDTO; tile: ClientTile }) => {
-            console.log('tile' + cdxo.toCoord(obj.coord).toString() + 'を受信しました');
-            this.putTile(cdxo.toCoord(obj.coord), obj.tile);
+        socket.onTile(obj => {
+            console.log('tile' + obj.coord.toString() + 'を受信しました');
+            this.putTile(obj.coord, obj.tile);
         });
-        emitter.on('opened', () => {
-        });
-        emitter.on('flagged', () => {
-        });
-        emitter.on('exploded', (coordDTO: ifs.ICoordDTO) => {
-            var coord = cdxo.toCoord(coordDTO);
+        socket.onExploded(coord => {
             this.putTile(coord, new ClientTile(
                 enums.Landform.BOMB,
                 enums.Status.OPEN,
@@ -53,13 +45,13 @@ class Landform extends LandformBase {
     /** @override */
     /** @protected */
     requestTileChunk(coord: Coord): void {
-        if (this.emitter == null)
+        if (this.socket == null)
             return;
         var req = this.joinRequests[coord.toString()];
         if (req != null && Date.now() - req.getTime() < 5 * 1000)
             return;
         this.joinRequests[coord.toString()] = new Date();
-        this.emitter.emit('join_chunk', cdxo.fromCoord(coord));
+        this.socket.joinChunk(coord);
         console.log('Chunk' + coord.toString() + 'を要求しました');
     }
 }
