@@ -7,7 +7,7 @@ var WS_ADDRESS = location.href.indexOf('minesweeper') >= 0
     : '127.0.0.1';
 
 export function connect() {
-    var server = io(WS_ADDRESS);
+    var server: Socket = io(WS_ADDRESS);
     server.on('connect', () => {
         server.emit('user_id', getOrCreateUserId());
     });

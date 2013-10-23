@@ -23,6 +23,7 @@ class ActivePlayers extends ee2.EventEmitter2 {
     setPlayers(items: cifs.IHash<Player>, field: Landform) {
         this.items = items;
         Object.keys(items).forEach(id => {
+            items[parseInt(id)].setField(field);
             super.emit('player_added', { id: id, player: items[id] });
         });
         this.emitter.on('moved', (obj: iv.IMoveDTO) => {
@@ -30,7 +31,8 @@ class ActivePlayers extends ee2.EventEmitter2 {
             super.emit('player_moved', { id: obj.id, coord: this.items[obj.id].coord });
         });
         this.emitter.on('player_activated', (obj: { id: number; player: iv.IPlayerDTO }) => {
-            var player = dxo.toPlayer(obj.player, field);
+            var player = dxo.toPlayer(obj.player);
+            player.setField(field);
             this.items[obj.id] = player;
             super.emit('player_added', { id: obj.id, player: player });
             if (obj.id === this.centralPlayer) {

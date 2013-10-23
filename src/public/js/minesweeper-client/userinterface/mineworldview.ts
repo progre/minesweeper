@@ -1,7 +1,7 @@
 import ee2 = require('eventemitter2');
 import game = require('./../../framework/game');
 import Coord = require('./../../minesweeper-common/domain/valueobject/coord');
-import MineWorld = require('./../domain/entity/mineworld');
+import GameMain = require('./../application/gamemain');
 import Camera = require('./entity/camera');
 import ActivePlayersView = require('./activeplayersview');
 import LandformView = require('./landformview');
@@ -17,13 +17,13 @@ class MineWorldView {
     private size = new game.Rect(0, 0);
     private camera = new Camera(Coord.of('0', '0'));
 
-    constructor(private loadQueue: createjs.LoadQueue, private mineWorld: MineWorld) {
-        this.landformView = new LandformView(loadQueue, mineWorld.landform, this.camera);
-        this.activePlayersView = new ActivePlayersView(loadQueue, this.camera, mineWorld.activePlayers);
+    constructor(private loadQueue: createjs.LoadQueue, gameMain: GameMain) {
+        this.landformView = new LandformView(loadQueue, gameMain.landform, this.camera);
+        this.activePlayersView = new ActivePlayersView(loadQueue, this.camera, gameMain.activePlayers);
 
-        this.mineWorld.activePlayers.on('central_player_selected', (id: number) => {
-            this.camera.setCenter(mineWorld.activePlayers.get(id).coord);
-            mineWorld.activePlayers.on('player_moved', (obj: { id: number; coord: Coord }) => {
+        gameMain.activePlayers.on('central_player_selected', (id: number) => {
+            this.camera.setCenter(gameMain.activePlayers.get(id).coord);
+            gameMain.activePlayers.on('player_moved', (obj: { id: number; coord: Coord }) => {
                 if (obj.id !== id)
                     return;
                 this.camera.setCenter(obj.coord);
@@ -36,7 +36,7 @@ class MineWorldView {
                 eventObj.stageX - (this.size.width >> 1),
                 eventObj.stageY - (this.size.height >> 1));
             var type = eventObj.nativeEvent.button;
-            mineWorld.activePlayers.getCentralPlayer().action(type === 0, coord);
+            gameMain.activePlayers.getCentralPlayer().action(type === 0, coord);
         });
 
         this.displayObject.addChild(this.clickObject);

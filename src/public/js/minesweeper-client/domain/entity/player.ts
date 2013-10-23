@@ -7,18 +7,24 @@ import Landform = require('./landform');
 export = Player;
 class Player {
     private emitter: Socket;
+    private field: Landform;
 
     constructor(
         public coord: Coord,
-        public image: string,
-        private field: Landform) {
+        public image: string) {
     }
 
     setEmitter(emitter: Socket) {
         this.emitter = emitter;
     }
 
+    setField(field: Landform) {
+        this.field = field;
+    }
+
     action(primary: boolean, coord: Coord) {
+        if (this.field == null)
+            return;
         var path = this.field.pathFinder.find(this.coord, coord);
         if (path.length === 0)
             return;
