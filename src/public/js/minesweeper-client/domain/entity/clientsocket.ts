@@ -36,13 +36,17 @@ class ClientSocket {
         this.socket.on('chunk', (obj: { coord: ifs.ICoordDTO; chunk: ClientTile[][] }) =>
             callback({
                 coord: cdxo.toCoord(obj.coord),
-                chunk: <Chunk<ClientTile>>new Chunk(obj.chunk)
+                chunk: new Chunk(
+                    obj.chunk.map(x=> x.map(x=> ClientTile.createInstance(x))))
             }));
     }
 
     onTile(callback: (obj: { coord: Coord; tile: ClientTile }) => void) {
         this.socket.on('tile', (obj: { coord: ifs.ICoordDTO; tile: ClientTile }) =>
-            callback({ coord: cdxo.toCoord(obj.coord), tile: obj.tile }));
+            callback({
+                coord: cdxo.toCoord(obj.coord),
+                tile: ClientTile.createInstance(obj.tile)
+            }));
     }
 
     onExploded(callback: (coord: Coord) => void) {

@@ -1,6 +1,5 @@
 import Enumerable = require('./../../../lib/linq');
 import LandformBase = require('./../../../minesweeper-common/domain/entity/landformbase');
-import PathFinder = require('./../../../minesweeper-common/domain/entity/pathfinder');
 import Chunk = require('./../../../minesweeper-common/domain/entity/chunk');
 import enums = require('./../../../minesweeper-common/domain/valueobject/enums');
 import ClientTile = require('./../../../minesweeper-common/domain/valueobject/clienttile');
@@ -10,7 +9,6 @@ import Player = require('./player');
 
 export = Landform;
 class Landform extends LandformBase {
-    pathFinder = new PathFinder(this);
     private socket: ClientSocket;
     private joinRequests: { [coord: string]: Date } = {};
 
@@ -33,28 +31,6 @@ class Landform extends LandformBase {
                 -1));
             this.emit('exploded', coord);
         });
-    }
-
-    dig(coord: Coord) {
-        var tile = this.getTile(coord);
-        if (tile.status !== enums.Status.CLOSE
-            || tile.layer !== enums.Layer.NONE)
-            return;
-        tile.status = enums.Status.OPEN;
-    }
-
-    setLayer(coord: Coord, layer: enums.Layer) {
-        var tile = this.getTile(coord);
-        tile.layer = layer;
-    }
-
-    /** @override */
-    /** @protected */
-    isMovable(coord: Coord) {
-        var tile: ClientTile = this.getTile(coord);
-        return tile != null
-            && tile.status === enums.Status.OPEN
-            && tile.landform === enums.Landform.NONE;
     }
 
     /** @override */

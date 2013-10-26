@@ -15,12 +15,10 @@ var logger = log4js.getLogger();
 
 export = Landform;
 class Landform extends LandformBase {
-    pathFinder: PathFinder;
     private players = new CoordMultiMap();
 
     constructor() {
         super();
-        this.pathFinder = new PathFinder(this);
     }
 
     /** @override */
@@ -95,16 +93,18 @@ class Landform extends LandformBase {
         return this.toClientTile(chunk, coord);
     }
 
-    isMovable(coord: Coord) {
-        return this.getTile(coord).isMovable();
+    setLayer(coord: Coord, layer: enums.Layer) {
+        var tile = super.setLayer(coord, layer);
+        var clientTile = this.toClientTile(tile, coord);
+        var players = this.players.get(Chunk.coordFromGlobal(coord));
+        players.forEach(player =>
+            player.notifyTile(coord, clientTile));
     }
 
     dig(coord: Coord) {
-        var tile = this.getTile(coord);
-        if (tile.status !== enums.Status.CLOSE
-            || tile.layer !== enums.Layer.NONE)
+        var tile = super.dig(coord);
+        if (tile == null)
             return;
-        tile.status = enums.Status.OPEN;
         var clientTile = this.toClientTile(tile, coord);
         var players = this.players.get(Chunk.coordFromGlobal(coord));
         if (tile.landform === enums.Landform.BOMB) {
@@ -121,15 +121,6 @@ class Landform extends LandformBase {
                     this.dig(around);
                 }, 10);
         }
-    }
-
-    setLayer(coord: Coord, layer: enums.Layer) {
-        var tile = this.getTile(coord);
-        tile.layer = layer;
-        var clientTile = this.toClientTile(tile, coord);
-        var players = this.players.get(Chunk.coordFromGlobal(coord));
-        players.forEach(player =>
-            player.notifyTile(coord, clientTile));
     }
 
     private toClientTile(tile: Tile, coord: Coord) {
@@ -170,11 +161,6 @@ class Landform extends LandformBase {
             return Tile.UNKNOWN;
         }
     }
-}
-
-function isMovable(tile: Tile) {
-    return tile.status === enums.Status.OPEN
-        && tile.landform === enums.Landform.NONE;
 }
 
 /** 16x16の地形を作成する */

@@ -22,12 +22,6 @@ class MineWorldView {
 
         gameMain.activePlayers.on('central_player_selected', (id: number) => {
             this.camera.setCenter(gameMain.activePlayers.get(id).coord);
-            //gameMain.activePlayers.on('player_moved', (obj: { id: number; coord: Coord }) => {
-            //    if (obj.id !== id)
-            //        return;
-            //    this.camera.setCenter(obj.coord);
-            //    this.landformView.refreshBlocks();
-            //});
             var player = gameMain.activePlayers.getCentralPlayer();
             player.on('moved', () => {
                 this.camera.setCenter(player.coord);
