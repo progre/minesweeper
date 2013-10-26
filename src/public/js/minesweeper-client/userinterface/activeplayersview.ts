@@ -1,6 +1,7 @@
 import Coord = require('./../../minesweeper-common/domain/valueobject/coord');
 import ifs = require('./../../minesweeper-common/domain/entity/interfaces');
 import ActivePlayers = require('./../domain/entity/activeplayers');
+import Player = require('./../domain/entity/player');
 import Camera = require('./entity/camera');
 
 class PlayerView {
@@ -15,7 +16,7 @@ class PlayerView {
 
     displayObject: createjs.Sprite;
 
-    constructor(private loadQueue: createjs.LoadQueue, private model: ifs.IPlayer, private camera: Camera) {
+    constructor(private loadQueue: createjs.LoadQueue, private model: Player, private camera: Camera) {
         this.displayObject = this.getCharactor(model.image);
         this.displayObject.gotoAndPlay('walk');
 
@@ -86,6 +87,8 @@ class ActivePlayersView {
         this.displayObject.mouseEnabled = false;
 
         activePlayers.on('player_moved', (obj: { id: number; coord: Coord }) => {
+            if (obj.id === activePlayers.getCentralPlayerID())
+                return;
             this.items[obj.id].updatePosition();
         });
         activePlayers.on('player_added', (obj: { id: number; player: ifs.IPlayer }) => {

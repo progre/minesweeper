@@ -95,13 +95,6 @@ class Landform extends LandformBase {
         return this.toClientTile(chunk, coord);
     }
 
-    move(player: Player, to: Coord) {
-        if (!this.isMovable(to))
-            return false;
-        player.coord = to;
-        return true;
-    }
-
     isMovable(coord: Coord) {
         return this.getTile(coord).isMovable();
     }

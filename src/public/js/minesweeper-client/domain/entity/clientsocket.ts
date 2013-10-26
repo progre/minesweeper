@@ -90,7 +90,7 @@ class ClientSocket {
     }
 }
 
-function toPlayer(dto: ifs.IPlayerDTO): Player {
+function toPlayer(dto: ifs.IPlayerDTO) {
     return new Player(
         cdxo.toCoord(dto.coord),
         dto.image);

@@ -8,16 +8,16 @@ class GameMain {
     landform = new Landform();
 
     constructor() {
-        // ƒT[ƒo[‚ÉÚ‘±
-        console.log('ƒT[ƒo[‚ÉÚ‘±‚µ‚Ü‚·...');
+        // ã‚µãƒ¼ãƒãƒ¼ã«æ¥ç¶š
+        console.log('ã‚µãƒ¼ãƒãƒ¼ã«æ¥ç¶šã—ã¾ã™...');
         var socket = new ClientSocket();
         socket.connect(() => {
-            console.log('Ú‘±‚µ‚Ü‚µ‚½');
+            console.log('æ¥ç¶šã—ã¾ã—ãŸ');
 
             this.activePlayers.setSocket(socket);
             this.landform.setSocket(socket);
             socket.onFullData(obj => {
-                console.log('ƒvƒŒƒCƒ„[' + Enumerable.from(obj.activePlayers).count() + 'l‚ªQ‰Á’†');
+                console.log('ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼' + Enumerable.from(obj.activePlayers).count() + 'äººãŒå‚åŠ ä¸­');
                 this.activePlayers.setPlayers(obj.activePlayers, this.landform);
                 this.activePlayers.setCentralPlayer(obj.yourID);
             });

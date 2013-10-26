@@ -1,13 +1,13 @@
 import ee2 = require('eventemitter2');
 import cifs = require('./../../../minesweeper-common/domain/entity/interfaces');
-import Player = require('./player');
 import Landform = require('./landform');
 import ClientSocket = require('./clientsocket');
+import Player = require('./player');
 
 export = ActivePlayers;
 class ActivePlayers extends ee2.EventEmitter2 {
-    private centralPlayer: number;
-    private items: cifs.IHash<Player> = null;
+    private centralPlayerID: number;
+    private items: cifs.IHash<Player> = [];
     private socket: ClientSocket;
 
     get(id: number): Player {
@@ -32,7 +32,7 @@ class ActivePlayers extends ee2.EventEmitter2 {
             obj.player.setField(field);
             this.items[obj.id] = obj.player;
             super.emit('player_added', obj);
-            if (obj.id === this.centralPlayer) {
+            if (obj.id === this.centralPlayerID) {
                 this.selectCentralPlayer();
             }
         });
@@ -44,14 +44,18 @@ class ActivePlayers extends ee2.EventEmitter2 {
     }
 
     setCentralPlayer(id: number) {
-        this.centralPlayer = id;
+        this.centralPlayerID = id;
         if (this.get(id) != null) {
             this.selectCentralPlayer();
         }
     }
 
     getCentralPlayer() {
-        return this.get(this.centralPlayer);
+        return this.get(this.centralPlayerID);
+    }
+
+    getCentralPlayerID() {
+        return this.centralPlayerID;
     }
 
     count() {
@@ -60,6 +64,6 @@ class ActivePlayers extends ee2.EventEmitter2 {
 
     private selectCentralPlayer() {
         this.getCentralPlayer().setSocket(this.socket);
-        super.emit('central_player_selected', this.centralPlayer);
+        super.emit('central_player_selected', this.centralPlayerID);
     }
 }

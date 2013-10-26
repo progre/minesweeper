@@ -1,4 +1,3 @@
-import ee2 = require('eventemitter2');
 import Enumerable = require('./../../../lib/linq');
 import LandformBase = require('./../../../minesweeper-common/domain/entity/landformbase');
 import PathFinder = require('./../../../minesweeper-common/domain/entity/pathfinder');
@@ -7,6 +6,7 @@ import enums = require('./../../../minesweeper-common/domain/valueobject/enums')
 import ClientTile = require('./../../../minesweeper-common/domain/valueobject/clienttile');
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
 import ClientSocket = require('./clientsocket');
+import Player = require('./player');
 
 export = Landform;
 class Landform extends LandformBase {
@@ -35,6 +35,21 @@ class Landform extends LandformBase {
         });
     }
 
+    dig(coord: Coord) {
+        var tile = this.getTile(coord);
+        if (tile.status !== enums.Status.CLOSE
+            || tile.layer !== enums.Layer.NONE)
+            return;
+        tile.status = enums.Status.OPEN;
+    }
+
+    setLayer(coord: Coord, layer: enums.Layer) {
+        var tile = this.getTile(coord);
+        tile.layer = layer;
+    }
+
+    /** @override */
+    /** @protected */
     isMovable(coord: Coord) {
         var tile: ClientTile = this.getTile(coord);
         return tile != null
