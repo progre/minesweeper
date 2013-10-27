@@ -80,6 +80,21 @@ class LoadScene implements Scene {
         this.displayObject.addChild(front);
         front.alpha = 1.0;
         this.loadAnimation = createjs.Tween.get(front);
+        this.shortAnimate();
+    }
+
+    private shortAnimate() {
+        this.loadAnimation.to({ alpha: 1.0 }, 100)
+            .call(tweenObject => {
+                if (!this.loadComplete)
+                    tweenObject.pause(null);
+            })
+            .call(tweenObject => {
+                this.done = true;
+            });
+    }
+
+    private longAnimate() {
         this.loadAnimation.to({ alpha: 0.0 }, 1000)
             .wait(2000)
             .call(tweenObject => {

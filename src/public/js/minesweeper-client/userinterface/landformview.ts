@@ -32,7 +32,7 @@ class LandformView {
         this.frontDisplayObject.addChild(this.layer);
         this.frontDisplayObject.addChild(this.cachelessLayer);
         landform.on('chunk_updated', (coord: Coord) => {
-            this.updateBlocks();
+            this.refreshBlocks();
         });
         landform.on('view_point_updated', (coord: Coord) => {
             this.updateBlocks();
@@ -84,7 +84,7 @@ class LandformView {
         this.updateBlocks();
     }
 
-    private updateBlocks() {
+    updateBlocks() {
         if (this.tiles == null || this.tiles.length <= 0)
             return;
         var rows = this.tiles.length;

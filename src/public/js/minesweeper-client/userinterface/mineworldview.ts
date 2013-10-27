@@ -25,8 +25,9 @@ class MineWorldView {
             var player = gameMain.activePlayers.getCentralPlayer();
             player.on('moved', () => {
                 this.camera.setCenter(player.coord);
-                this.landformView.refreshBlocks();
+                this.landformView.updateBlocks();
             });
+            this.landformView.refreshBlocks();
         });
 
         this.clickObject.addEventListener('click', (eventObj: any) => {
