@@ -1,23 +1,43 @@
 doctype 5
 head
-  link(rel='stylesheet', href='/css/style.css')
-  script(src='/js/lib/socket.io-client.js')
-  script(src='/js/lib/linq.min.js')
-  script(src='/js/lib/cookie.min.js')
-  script(src='//cdn.robotwebtools.org/EventEmitter2/0.4.11/eventemitter2.min.js')
-  script(src='//code.createjs.com/createjs-2013.09.25.min.js')
-  script(src='//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.8/require.js', data-main='js/main')
-  script.
-    requirejs.config({
-      enforceDefine: true,
-      paths: {
-        'jsbn': 'lib/jsbn',
-        'eventemitter2': 'lib/eventemitter2'
-      }
-    });
-
-  if debug
-    script(src='//localhost:35729/livereload.js')
   meta(name='viewport', content='width=device-width, initial-scale=1.0')
-div
-  canvas#canvas(width=0, height=0)
+  title 無限マインスイーパー | 一生遊べるマインスイーパー
+h1 無限マインスイーパー（β）
+a.twitter-share-button(href='https://twitter.com/share', data-lang='ja', data-url='http://ms.prgrssv.net/') ツイート
+h2 遊び方
+p
+  ul
+    li 空いているマスをクリックするとその場に移動します
+    li 閉じているマスをクリックすると移動して開きます
+    li 閉じているマスを右クリックすると移動して旗を立てます
+  | うまく動かない時は再読み込みボタンを、それでもだめなときは強制再読み込みボタンを押してください
+button(onclick='document.getElementById("mainframe").contentWindow.location.reload();') 再読み込み
+button(onclick='document.getElementById("mainframe").contentWindow.location.reload(true);') 強制再読み込み
+div(style='text-align: center')
+  iframe(id='mainframe', src='game.html', width=640, height=480)
+
+p
+  ul
+    li 作った人: 
+      a(href='https://twitter.com/progremaster') ぷろぐれ
+    li 使用した素材:
+      ul
+        li
+          a(href='http://blog.livedoor.jp/masayan_for_sky/archives/6041552.html') http://blog.livedoor.jp/masayan_for_sky/archives/6041552.html
+        li
+          a(href='http://banraku-games.sakura.ne.jp/') http://banraku-games.sakura.ne.jp/
+        li
+          a(href='http://mhdc.digi2.jp/free/index.html') http://mhdc.digi2.jp/free/index.html
+        li
+          a(href='http://www35.tok2.com/home/oriome/distribution.html') http://www35.tok2.com/home/oriome/distribution.html
+        li
+          a(href='http://piposozai.blog76.fc2.com/blog-category-2.html') http://piposozai.blog76.fc2.com/blog-category-2.html
+script.
+  !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+script.
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-43486767-5', 'prgrssv.net');
+  ga('send', 'pageview');

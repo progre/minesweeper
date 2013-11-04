@@ -15,12 +15,10 @@ class Landform extends LandformBase {
     setSocket(socket: ClientSocket) {
         this.socket = socket;
         socket.onChunk(obj => {
-            console.log('Chunk' + obj.coord.toString() + 'を受信しました');
             delete this.joinRequests[obj.coord.toString()];
             this.putTileChunk(obj.coord, obj.chunk);
         });
         socket.onTile(obj => {
-            console.log('tile' + obj.coord.toString() + 'を受信しました');
             this.putTile(obj.coord, obj.tile);
         });
         socket.onExploded(coord => {
@@ -43,6 +41,5 @@ class Landform extends LandformBase {
             return;
         this.joinRequests[coord.toString()] = new Date();
         this.socket.joinChunk(coord);
-        console.log('Chunk' + coord.toString() + 'を要求しました');
     }
 }

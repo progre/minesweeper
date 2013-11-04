@@ -12,7 +12,7 @@ export module chunks {
             }
             collection.find({ key: key }).toArray((err, list) => {
                 db.close(true);
-                if (list == null || list[0].value == null) {
+                if (list == null || list.length === 0 || list[0].value == null) {
                     callback(null);
                     return;
                 }

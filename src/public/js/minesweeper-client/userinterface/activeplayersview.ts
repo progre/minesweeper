@@ -95,6 +95,8 @@ class ActivePlayersView {
             this.addPlayer(obj.id);
         });
         activePlayers.on('player_removed', (id: number) => {
+            if (this.items[id] == null)
+                return;
             this.displayObject.removeChild(this.items[id].displayObject);
             delete this.items[id];
             console.log('' + id + 'を削除');

@@ -2,8 +2,10 @@ declare var io;
 declare var cookie;
 import BigInteger = require('jsbn');
 
-var WS_ADDRESS = location.href.indexOf('minesweeper') >= 0
+var WS_ADDRESS = location.href.indexOf('minesweeper-progre.rhcloud.com') >= 0
     ? 'minesweeper-progre.rhcloud.com:8000'
+    : location.href.indexOf('ms.prgrssv.net') >= 0
+    ? 'ms.prgrssv.net:8000'
     : '127.0.0.1';
 
 export function connect() {

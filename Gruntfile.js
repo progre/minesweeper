@@ -78,7 +78,7 @@ module.exports = function(grunt) {
           urlfunc: 'embedurl'
         },
         files: {
-          'public/css/style.css': 'src/public/css/style.styl'
+          'public/css/game.css': 'src/public/css/game.styl'
         }
       }
     },

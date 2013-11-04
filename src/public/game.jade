@@ -1,0 +1,23 @@
+doctype 5
+head
+  link(rel='stylesheet', href='/css/game.css')
+  script(src='/js/lib/socket.io-client.js')
+  script(src='/js/lib/linq.min.js')
+  script(src='/js/lib/cookie.min.js')
+  script(src='//cdn.robotwebtools.org/EventEmitter2/0.4.11/eventemitter2.min.js')
+  script(src='//code.createjs.com/createjs-2013.09.25.min.js')
+  script(src='//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.8/require.js', data-main='js/main')
+  script.
+    requirejs.config({
+      enforceDefine: true,
+      paths: {
+        'jsbn': 'lib/jsbn',
+        'eventemitter2': 'lib/eventemitter2'
+      }
+    });
+
+  if debug
+    script(src='//localhost:35729/livereload.js')
+  meta(name='viewport', content='width=device-width, initial-scale=1.0')
+div
+  canvas#canvas(width=640, height=480)
