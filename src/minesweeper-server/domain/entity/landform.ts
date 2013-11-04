@@ -10,11 +10,13 @@ import ClientTile = require('./../../../minesweeper-common/domain/valueobject/cl
 import Coord = require('./../../../minesweeper-common/domain/valueobject/coord');
 import MultiMap = require('./multimap');
 import Player = require('./player');
+import LandformChunkRepository = require('./landformchunkrepository');
 
 var logger = log4js.getLogger();
 
 export = Landform;
 class Landform extends LandformBase {
+    private landformChunkRepository = new LandformChunkRepository();
     private players = new CoordMultiMap();
 
     constructor() {
@@ -51,23 +53,12 @@ class Landform extends LandformBase {
     /** override */
     /** @protected */
     requestTileChunk(coord: Coord) {
-        // DBに取りに行ったり
-        (callback => callback(null))((chunk: Chunk<Tile>) => {
+        this.landformChunkRepository.get(coord, (chunk: Chunk<Tile>) => {
             if (chunk == null) {
                 chunk = createTileChunk();
-                if (coord.equals(Coord.fromNumber(-1, -1))) {
-                    setEmpty(chunk, 13, 13, 16, 16);
-                }
-                if (coord.equals(Coord.fromNumber(0, -1))) {
-                    setEmpty(chunk, 0, 13, 4, 16);
-                }
-                if (coord.equals(Coord.fromNumber(-1, 0))) {
-                    setEmpty(chunk, 13, 0, 16, 4);
-                }
-                if (coord.equals(Coord.fromNumber(0, 0))) {
-                    setEmpty(chunk, 0, 0, 4, 4);
-                }
-                // DBに書き込む？
+                clipIfStartArea(chunk, coord);
+                // DBに書き込む
+                this.landformChunkRepository.put(coord, chunk);
             }
             this.tileChunks.putByCoord(coord, chunk);
             var clientChunk = this.toClientChunk(chunk, coord);
@@ -186,6 +177,21 @@ function setEmpty(chunk: Chunk<Tile>, xBegin: number, yBegin: number, xEnd: numb
             tile.status = enums.Status.OPEN;
             tile.landform = enums.Landform.NONE;
         }
+    }
+}
+
+function clipIfStartArea(chunk: Chunk<Tile>, coord: Coord) {
+    if (coord.equals(Coord.fromNumber(-1, -1))) {
+        setEmpty(chunk, 13, 13, 16, 16);
+    }
+    if (coord.equals(Coord.fromNumber(0, -1))) {
+        setEmpty(chunk, 0, 13, 4, 16);
+    }
+    if (coord.equals(Coord.fromNumber(-1, 0))) {
+        setEmpty(chunk, 13, 0, 16, 4);
+    }
+    if (coord.equals(Coord.fromNumber(0, 0))) {
+        setEmpty(chunk, 0, 0, 4, 4);
     }
 }
 
