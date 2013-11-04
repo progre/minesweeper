@@ -15,4 +15,7 @@ class LandformChunkRepository {
 
     put(coord: Coord, chunk: Chunk<Tile>) {
     }
+
+    putShred(coord: Coord, tile: Tile) {
+    }
 }

@@ -86,6 +86,7 @@ class Landform extends LandformBase {
 
     setLayer(coord: Coord, layer: enums.Layer) {
         var tile = super.setLayer(coord, layer);
+        this.landformChunkRepository.putShred(coord, tile);
         var clientTile = this.toClientTile(tile, coord);
         var players = this.players.get(Chunk.coordFromGlobal(coord));
         players.forEach(player =>
@@ -96,6 +97,7 @@ class Landform extends LandformBase {
         var tile = super.dig(coord);
         if (tile == null)
             return;
+        this.landformChunkRepository.putShred(coord, tile);
         var clientTile = this.toClientTile(tile, coord);
         var players = this.players.get(Chunk.coordFromGlobal(coord));
         if (tile.landform === enums.Landform.BOMB) {
